@@ -1,0 +1,43 @@
+version: 0.1.0-{build}
+
+skip_tags: false
+
+platform: x64
+configuration: Release
+
+clone_folder: C:\controller-display
+
+install:
+  - set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%
+  -
+  - bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
+  - bash -lc "pacman --noconfirm -Syyu"
+  - bash -lc "pacman --noconfirm -Su mingw-w64-x86_64-ninja zip"
+
+build: off
+build_script:
+  - git submodule update --init --recursive
+  - make
+  -
+  - mkdir controller-display-v0.1.0
+  - strip --strip-all --remove-section=.comment --remove-section=.note out\controller-display.exe
+  - cp -r out/controller-display.exe assets/ controller-display-v0.1.0/
+  - pushd controller-display-v0.1.0 && zip -r9 controller-display-v0.1.0.zip . && popd
+
+test: off
+
+artifacts:
+  - path: controller-display-v0.1.0.zip
+
+deploy:
+  provider: GitHub
+  artifact: controller-display-v0.1.0.zip
+  auth_token:
+    secure: EkOkcCZ4a/dABbDLVL5y3UOK15E9a+crKruLCTOUAkbFR8+N5MdjSns3BZs/OHg4
+  on:
+    appveyor_repo_tag: true
+
+notifications:
+  - provider: Email
+    to: nabijaczleweli@gmail.com
+    on_build_status_changed: true

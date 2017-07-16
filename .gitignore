@@ -1,0 +1,17 @@
+*
+!assets
+!assets/**
+!doc
+!doc/**
+!ext
+!ext/**
+!src
+!src/**
+!.git*
+!.clang-format
+!*.yml
+!*Makefile
+!*.sublime-project
+!LICENSE
+!README.md
+!controller-display.rc

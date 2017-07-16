@@ -1,0 +1,15 @@
+[submodule "ext/cereal"]
+	path = ext/cereal
+	url = https://github.com/USCiLab/cereal
+	branch = v1.2.2
+[submodule "ext/fmt"]
+	path = ext/fmt
+	url = https://github.com/fmtlib/fmt
+	branch = 4.0.0
+[submodule "ext/whereami-cpp"]
+	path = ext/whereami-cpp
+	url = https://github.com/nabijaczleweli/whereami-cpp
+	branch = v1.1.0
+[submodule "ext/SFML"]
+	path = ext/SFML
+	url = https://github.com/SFML/SFML

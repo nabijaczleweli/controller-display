@@ -20,11 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#include "container.hpp"
+#include "assets.hpp"
+#include <whereami++.hpp>
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
-}
+const std::string app_name("controller-display");
+/***/ config app_configuration(whereami::executable_dir() + "/" + app_name + ".cfg");
+
+
+const sf::Font font_default([] {
+	sf::Font tmp;
+	tmp.loadFromMemory(assets::DejaVuSansMono_ttf, sizeof assets::DejaVuSansMono_ttf);
+	return tmp;
+}());

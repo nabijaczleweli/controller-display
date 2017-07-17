@@ -20,11 +20,16 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#pragma once
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
-}
+#include "config.hpp"
+#include <SFML/Graphics.hpp>
+#include <string>
+
+
+extern const std::string app_name;
+extern /***/ config app_configuration;
+
+
+extern const sf::Font font_default;

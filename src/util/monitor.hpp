@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2017 nabijaczleweli
+// Copyright (c) 2016 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -20,11 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#pragma once
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
-}
+unsigned int refresh_rate();

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2017 nabijaczleweli
+// Copyright (c) 2015 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -20,11 +20,23 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#include "screen.hpp"
+#include "../../data/container.hpp"
+#include "../application.hpp"
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
+void screen::setup() {}
+
+int screen::handle_event(const sf::Event & event) {
+	if(event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+		app.window.close();
+	else if(event.type == sf::Event::MouseButtonPressed)
+		app.window.requestFocus();
+	else if(event.type == sf::Event::Count)
+		throw sf::Event::Count;
+	return 0;
 }
+
+screen::screen(application & theapp) : app(theapp) {}
+
+screen::~screen() {}

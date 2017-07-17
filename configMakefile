@@ -24,12 +24,12 @@ ifeq "$(OS)" "Windows_NT"
 	EXE := .exe
 	DLL := .dll
 	PIC :=
-	OS_LD_LIBS :=
+	OS_LD_LIBS := opengl32 winmm gdi32
 else
 	EXE :=
 	DLL := .so
 	PIC := -fPIC
-	OS_LD_LIBS := Xrandr X11
+	OS_LD_LIBS := Xrandr X11 GL udev jpeg freetype
 endif
 
 ifneq "$(ADDITIONAL_INCLUDE_DIR)" ""

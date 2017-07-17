@@ -85,29 +85,6 @@ matrix:
             - libxcb-image0-dev
             - libxcb-randr0-dev
           sources: *sources
-    # It's on trusty because the precise source hasn't landed; see https://github.com/travis-ci/apt-source-whitelist/issues/360
-    - env: CXX=clang++-4.0 CC=clang-4.0 WORKAROUND_1568899=false
-      dist: trusty
-      addons:
-        apt:
-          packages:
-            - clang-4.0
-            - unzip
-            - libpthread-stubs0-dev
-            - libgl1-mesa-dev
-            - libx11-dev
-            - libxrandr-dev
-            - libfreetype6-dev
-            - libglew-dev
-            - libjpeg8-dev
-            - libsndfile1-dev
-            - libflac-dev
-            - libopenal-dev
-            - libudev-dev
-            - libx11-xcb-dev
-            - libxcb-image0-dev
-            - libxcb-randr0-dev
-          sources: *sources
     - env: CXX=clang++-5.0 CC=clang-5.0 WORKAROUND_1568899=false
       addons:
         apt:
@@ -151,18 +128,14 @@ install:
 script: ADDITIONAL_INCLUDE_DIR="$LIB_INSTALLDIR/include" ADDITIONAL_LINK_DIR="$LIB_INSTALLDIR/lib" make
 
 before_deploy:
-  - mkdir release
-  - mv out/controller-display.out out/controller-display
-  - cp -r out/controller-display assets release/
-  - strip --strip-all --remove-section=.comment --remove-section=.note release/controller-display
-  - mv release "controller-display-$TRAVIS_TAG"
-  - tar -caf "controller-display-$TRAVIS_TAG.tbz2" "controller-display-$TRAVIS_TAG"
+  - mv out/controller-display "controller-display-$TRAVIS_TAG"
+  - strip --strip-all --remove-section=.comment --remove-section=.note "controller-display-$TRAVIS_TAG"
 
 deploy:
   provider: releases
   api-key:
     secure: f9TPLBJKM9iWESwaKyNVLWuAZhURMw/LUQ6+65ykFGwMtQcVeEqxCWGTakGp+8rrnd1zyZvRAsWHrPjW4Ec4VB17iwHg5EKS1gQ/aNvrofp6YMyNlMtsRtDkwZr54up2vIAXBRRPYGlTI9uUUTsiDLQKyIT9L870pQEMLmbSEjsC2jiJgCYq8JE9BWyPOTNkeR2iLreL9HhKj9ZL59gaR4yEIEJ6RCC66BM5/2Ha7Tw+df+/1+bvTLFUngME4dae8IKpRB5UDCLe3Q+7MYv/uUJwlfcm3mhyz7eF7Y0uaJg7N9GQc+21PfPI2ac7GQ/eCjQgYJ1IC3YBUwvZ16ZBrXURzV6HdmP/wb2OwDdmN+ovqx7ETaUnGrQjLfSKQ972EgF6C4xxxyz+65jR3W5NqDYXyKUf9D0hqs5TGjuxn4sZX9idQiHG3+YCrEnmYRGv6sCuaQ8z+sEHGsvgv7Zid/CsFn7zXB5Cl0scZxXDj6csUSnuYRkdMOdHP7DEBXpPP3yUTckHjAcUEKKcAP3R3UPXm+3ytHXhcKA0G6q66sAmcvi1iEu8F7aoPH16GqtPFFHjdLa1DlcJfPDj1qDAEvqekYxCniHY5lJoqn0MthcPXZRV7kCdCTVnO1y9OVcEUTubOJX20Ua7GlhcgdImZLfd7edF2vkoibktupxCsyg=
-  file: "controller-display-$TRAVIS_TAG.tbz2"
+  file: "controller-display-$TRAVIS_TAG"
   skip_cleanup: true
   on:
     tags: true

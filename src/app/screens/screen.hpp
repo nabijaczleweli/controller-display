@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2017 nabijaczleweli
+// Copyright (c) 2015 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -20,11 +20,23 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#pragma once
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
-}
+#include <SFML/Window.hpp>
+
+
+class application;
+class screen {
+protected:
+	application & app;
+
+public:
+	virtual void setup();
+	virtual int loop() = 0;
+	virtual int draw() = 0;
+	virtual int handle_event(const sf::Event & event);
+
+	screen(application & theapp);
+	virtual ~screen();
+};

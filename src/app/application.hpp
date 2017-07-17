@@ -20,11 +20,36 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#pragma once
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
-}
+#include "screens/screen.hpp"
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <memory>
+
+
+class application {
+private:
+	friend screen;
+
+	std::unique_ptr<screen> current_screen;
+	std::unique_ptr<screen> temp_screen;
+
+	sf::RenderWindow window;
+
+	int loop();
+	int draw();
+
+
+public:
+	static unsigned int effective_FPS();
+
+
+	int run();
+
+	template <class T, class... A>
+	inline void schedule_screen(A &&... args) {
+		temp_screen = std::make_unique<T>(*this, std::forward<A>(args)...);
+	}
+};

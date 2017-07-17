@@ -20,11 +20,21 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#pragma once
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
-}
+#include <string>
+
+
+class config {
+public:
+	bool vsync       = true;
+	unsigned int FPS = 60;
+
+
+	config(std::string && path);
+	~config();
+
+private:
+	std::string path;
+};

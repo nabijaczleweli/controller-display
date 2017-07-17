@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2017 nabijaczleweli
+// Copyright (c) 2016 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -20,11 +20,34 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "app/application.hpp"
+#include "monitor.hpp"
 
 
-int main() {
-	application app;
-	// Schedule main screen here
-	// return app.run();
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+
+unsigned int refresh_rate() {
+	DEVMODE dmode{};
+	dmode.dmSize = sizeof(DEVMODE);
+	EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &dmode);
+	return dmode.dmDisplayFrequency;
 }
+#else
+#include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
+#include <unistd.h>
+
+
+unsigned int refresh_rate() {
+	auto dpy  = XOpenDisplay(nullptr);
+	auto root = RootWindow(dpy, 0);
+
+	const auto conf         = XRRGetScreenInfo(dpy, root);
+	const auto current_rate = XRRConfigCurrentRate(conf);
+
+	XCloseDisplay(dpy);
+	return current_rate;
+}
+#endif

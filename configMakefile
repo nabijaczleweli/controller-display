@@ -24,11 +24,13 @@ ifeq "$(OS)" "Windows_NT"
 	EXE := .exe
 	DLL := .dll
 	PIC :=
+	OS_LD_ARGS := -Wl,--subsystem,windows
 	OS_LD_LIBS := opengl32 winmm gdi32
 else
 	EXE :=
 	DLL := .so
 	PIC := -fPIC
+	OS_LD_ARGS :=
 	OS_LD_LIBS := Xrandr X11 GL udev jpeg freetype
 endif
 
@@ -47,7 +49,8 @@ endif
 INCCMAKEAR := CXXFLAGS="$(INCCXXAR)"
 LNCMAKEAR := LDFLAGS="$(LNCXXAR)"
 
-CONTROLLER_DISPLAY_VERSION := "$(patsubst v%,%,$(shell git describe --tags --abbrev=0))"
+#CONTROLLER_DISPLAY_VERSION := "$(patsubst v%,%,$(shell git describe --tags --abbrev=0))"
+CONTROLLER_DISPLAY_VERSION := "0.1.0"
 CEREAL_VERSION := "$(patsubst v%,%,$(shell git -C ext/cereal describe --tags))"
 WHEREAMI_CPP_VERSION := "$(patsubst v%,%,$(shell git -C ext/whereami-cpp describe --tags))"
 
@@ -67,8 +70,7 @@ ASSETDIR := assets/
 
 
 ifeq "$(OS)" "Windows_NT"
-	# OS_OBJS := $(OBJDIR)controller-display$(OBJ)
-	OS_OBJS :=
+	OS_OBJS := $(OBJDIR)controller-display$(OBJ)
 else
 	OS_OBJS :=
 endif

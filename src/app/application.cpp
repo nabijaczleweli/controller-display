@@ -21,6 +21,7 @@
 
 
 #include "application.hpp"
+#include "assets.hpp"
 #include "../data/container.hpp"
 #include "../util/monitor.hpp"
 #include <SFML/System.hpp>
@@ -34,17 +35,17 @@ unsigned int application::effective_FPS() {
 }
 
 int application::run() {
-	window.create({600, 300}, app_name, sf::Style::None);
+	window.create({600, 300}, app_name, sf::Style::Close);
 	if(app_configuration.vsync)
 		window.setVerticalSyncEnabled(true);
 	else
 		window.setFramerateLimit(app_configuration.FPS);
 
-	//{
-	//	sf::Image icon;
-	//	if(icon.loadFromFile(textures_root + "/gui/general/window_main.png"))
-	//		window.setIcon(icon.getSize().x, icon.getSize().x, icon.getPixelsPtr());
-	//}
+	{
+		sf::Image icon;
+		if(icon.loadFromMemory(assets::icon_icon_png, sizeof assets::icon_icon_png))
+			window.setIcon(icon.getSize().x, icon.getSize().x, icon.getPixelsPtr());
+	}
 
 	return loop();
 }

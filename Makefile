@@ -48,7 +48,7 @@ whereami-cpp : $(BLDDIR)whereami-cpp/libwhereami++$(ARCH)
 
 
 $(OUTDIR)controller-display$(EXE) : $(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,$(OBJ),$(SOURCES))) $(OS_OBJS)
-	$(CXX) $(CXXAR) -o$@ $^ $(PIC) -lsfml-window-s -lsfml-graphics-s -lsfml-system-s $(shell echo $(patsubst $(BLDDIR)SFML/lib/lib%.a,-l%,$(wildcard $(BLDDIR)SFML/lib/*$(ARCH))) | sed "s/ /\\n/g" | grep -v sfml) $(LDAR)
+	$(CXX) $(CXXAR) $(OS_LD_ARGS) -o$@ $^ $(PIC) -lsfml-window-s -lsfml-graphics-s -lsfml-system-s $(shell echo $(patsubst $(BLDDIR)SFML/lib/lib%.a,-l%,$(wildcard $(BLDDIR)SFML/lib/*$(ARCH))) | sed "s/ /\\n/g" | grep -v sfml) $(LDAR)
 
 $(BLDDIR)include/assets.hpp : $(ASSETS)
 	@mkdir -p $(dir $@)

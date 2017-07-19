@@ -20,37 +20,40 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#pragma once
+#include "main_app_screen.hpp"
+#include "../../../data/container.hpp"
+#include "../../application.hpp"
 
 
-#include "screens/screen.hpp"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <memory>
+void main_app_screen::setup() {
+	screen::setup();
+}
 
+int main_app_screen::loop() {
+	A_key.tick();
+	__key.tick();
+	at_key.tick();
+	lbracket_key.tick();
+	caret_key.tick();
+	return 0;
+}
 
-class application {
-private:
-	friend screen;
-	friend class main_app_screen;
+int main_app_screen::draw() {
+	app.window.draw(A_key);
+	app.window.draw(__key);
+	app.window.draw(at_key);
+	app.window.draw(lbracket_key);
+	app.window.draw(caret_key);
+	return 0;
+}
 
-	std::unique_ptr<screen> current_screen;
-	std::unique_ptr<screen> temp_screen;
+int main_app_screen::handle_event(const sf::Event & event) {
+	return screen::handle_event(event);
+}
 
-	sf::RenderWindow window;
-
-	int loop();
-	int draw();
-
-
-public:
-	static unsigned int effective_FPS();
-
-
-	int run();
-
-	template <class T, class... A>
-	inline void schedule_screen(A &&... args) {
-		temp_screen = std::make_unique<T>(*this, std::forward<A>(args)...);
-	}
-};
+main_app_screen::main_app_screen(application & theapp) : screen(theapp), A_key('A'), __key('_'), at_key('@'), lbracket_key('['), caret_key('^') {
+	__key.setPosition(70, 0);
+	at_key.setPosition(140, 0);
+	lbracket_key.setPosition(210, 0);
+	caret_key.setPosition(280, 0);
+}

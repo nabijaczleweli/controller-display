@@ -23,34 +23,25 @@
 #pragma once
 
 
-#include "screens/screen.hpp"
-#include <SFML/Graphics.hpp>
+#include "../../../draw/key.hpp"
+#include "../screen.hpp"
 #include <SFML/Window.hpp>
-#include <memory>
 
 
-class application {
+class main_app_screen : public screen {
 private:
-	friend screen;
-	friend class main_app_screen;
-
-	std::unique_ptr<screen> current_screen;
-	std::unique_ptr<screen> temp_screen;
-
-	sf::RenderWindow window;
-
-	int loop();
-	int draw();
-
+	key A_key;
+	key __key;
+	key at_key;
+	key lbracket_key;
+	key caret_key;
 
 public:
-	static unsigned int effective_FPS();
+	virtual void setup() override;
+	virtual int loop() override;
+	virtual int draw() override;
+	virtual int handle_event(const sf::Event & event) override;
 
-
-	int run();
-
-	template <class T, class... A>
-	inline void schedule_screen(A &&... args) {
-		temp_screen = std::make_unique<T>(*this, std::forward<A>(args)...);
-	}
+	main_app_screen(application & theapp);
+	virtual ~main_app_screen() = default;
 };

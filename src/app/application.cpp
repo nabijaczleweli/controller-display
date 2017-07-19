@@ -72,7 +72,7 @@ int application::loop() {
 }
 
 int application::draw() {
-	window.clear(sf::Color::Black);
+	window.clear(sf::Color::Transparent);
 
 	if(const int i = current_screen->draw())
 		return i;

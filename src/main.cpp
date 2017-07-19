@@ -21,10 +21,11 @@
 
 
 #include "app/application.hpp"
+#include "app/screens/main/main_app_screen.hpp"
 
 
 int main() {
 	application app;
-	// Schedule main screen here
-	// return app.run();
+	app.schedule_screen<main_app_screen>();
+	return app.run();
 }

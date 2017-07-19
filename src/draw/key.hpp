@@ -23,34 +23,19 @@
 #pragma once
 
 
-#include "screens/screen.hpp"
 #include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <memory>
 
 
-class application {
+class key : public sf::Drawable, public sf::Transformable {
 private:
-	friend screen;
-	friend class main_app_screen;
-
-	std::unique_ptr<screen> current_screen;
-	std::unique_ptr<screen> temp_screen;
-
-	sf::RenderWindow window;
-
-	int loop();
-	int draw();
+	sf::Text label;
+	sf::RectangleShape background;
 
 
 public:
-	static unsigned int effective_FPS();
+	key(char which);
 
+	void tick();
 
-	int run();
-
-	template <class T, class... A>
-	inline void schedule_screen(A &&... args) {
-		temp_screen = std::make_unique<T>(*this, std::forward<A>(args)...);
-	}
+	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 };

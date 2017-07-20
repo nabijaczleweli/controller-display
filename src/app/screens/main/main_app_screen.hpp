@@ -26,15 +26,12 @@
 #include "../../../draw/key.hpp"
 #include "../screen.hpp"
 #include <SFML/Window.hpp>
+#include <vector>
 
 
 class main_app_screen : public screen {
 private:
-	key A_key;
-	key __key;
-	key at_key;
-	key lbracket_key;
-	key caret_key;
+	std::vector<key> keys;
 
 public:
 	virtual void setup() override;

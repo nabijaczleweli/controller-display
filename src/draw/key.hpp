@@ -24,16 +24,18 @@
 
 
 #include <SFML/Graphics.hpp>
+#include "../data/key_data.hpp"
 
 
 class key : public sf::Drawable, public sf::Transformable {
 private:
+	const keyboard_key_data_t & data;
 	sf::Text label;
 	sf::RectangleShape background;
 
 
 public:
-	key(char which);
+	key(const std::string & key_id);
 
 	void tick();
 

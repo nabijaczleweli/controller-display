@@ -20,32 +20,28 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "main_app_screen.hpp"
-#include "../../../data/container.hpp"
-#include "../../application.hpp"
+#pragma once
 
 
-void main_app_screen::setup() {
-	screen::setup();
-}
+#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-int main_app_screen::loop() {
-	for_each(keys.begin(), keys.end(), [](auto && k) { k.tick(); });
-	return 0;
-}
 
-int main_app_screen::draw() {
-	for_each(keys.begin(), keys.end(), [&](auto && k) { app.window.draw(k); });
-	return 0;
-}
+template <class code_t>
+struct key_data {
+	code_t keycodes;
+	sf::String label;
 
-int main_app_screen::handle_event(const sf::Event & event) {
-	return screen::handle_event(event);
-}
+	bool need_shift;
+	bool need_no_shift;
 
-main_app_screen::main_app_screen(application & theapp) : screen(theapp), keys{key("a"), key("Num+"), key("Up"), key("~"), key("Control")} {
-	keys[1].setPosition(70, 0);
-	keys[2].setPosition(140, 0);
-	keys[3].setPosition(210, 0);
-	keys[4].setPosition(280, 0);
-}
+	bool proportional;
+};
+
+using keyboard_key_data_t = key_data<std::vector<sf::Keyboard::Key>>;
+
+
+const std::unordered_map<std::string, key_data<std::vector<sf::Keyboard::Key>>> & keyboard_key_data();

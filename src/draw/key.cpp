@@ -22,6 +22,7 @@
 
 #include "key.hpp"
 #include "../data/container.hpp"
+#include <algorithm>
 
 
 static const sf::Color label_colour(0x10, 0x10, 0x10);
@@ -29,44 +30,27 @@ static const sf::Color background_colour_clicked(0xF2, 0xF2, 0xF2);
 static const sf::Color background_colour_unclicked(0xD8, 0xD8, 0xD8);
 
 
-key::key(char which) : label(which, font_default, 40) {
-	auto && label_bounds        = label.getGlobalBounds();
-	const float background_size = label.getCharacterSize() + label.getCharacterSize() / 2;
+key::key(const std::string & key_id) : data(keyboard_key_data().at(key_id)), label(data.label, font_default, 40) {
+	auto && label_bounds          = label.getGlobalBounds();
+	const float background_height  = label.getCharacterSize() + label.getCharacterSize() / 2;
+	const float background_width   = data.proportional ? background_height : label.getCharacterSize() + label_bounds.width;
 
-	background.setSize({background_size, background_size});
+	background.setSize({background_width, background_height});
 	background.setOutlineThickness(-1);
 	background.setOutlineColor(sf::Color::Black);
 
 	label.setFillColor(label_colour);
-	label.setPosition(background_size / 2 - label_bounds.width / 2, label.getCharacterSize() / 4 / 2);
+	label.setPosition(background_width / 2 - label_bounds.width / 2, label.getCharacterSize() / 4 / 2);
 }
 
 void key::tick() {
-	bool need_shift          = false;
-	sf::Keyboard::Key my_key = sf::Keyboard::Unknown;
-	switch(label.getString()[0]) {
-		case 'A':
-			my_key = sf::Keyboard::A;
-			break;
-		case '_':
-			my_key     = sf::Keyboard::Dash;
-			need_shift = true;
-			break;
-		case '@':
-			my_key     = sf::Keyboard::Num2;
-			need_shift = true;
-			break;
-		case '[':
-			my_key = sf::Keyboard::LBracket;
-			break;
-		case '^':
-			my_key     = sf::Keyboard::Num6;
-			need_shift = true;
-			break;
+	bool shift_ok = !data.need_shift && !data.need_no_shift;
+	if(!shift_ok) {
+		const auto shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
+		shift_ok         = (data.need_shift && shift) || (data.need_no_shift && !shift);
 	}
 
-	if(sf::Keyboard::isKeyPressed(my_key) &&
-	   (!need_shift || sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)))
+	if(shift_ok && std::any_of(data.keycodes.begin(), data.keycodes.end(), sf::Keyboard::isKeyPressed))
 		background.setFillColor(background_colour_clicked);
 	else
 		background.setFillColor(background_colour_unclicked);

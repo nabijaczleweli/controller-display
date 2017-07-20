@@ -31,6 +31,6 @@ const std::string app_name("controller-display");
 
 const sf::Font font_default([] {
 	sf::Font tmp;
-	tmp.loadFromMemory(assets::DejaVuSansMono_ttf, sizeof assets::DejaVuSansMono_ttf);
+	tmp.loadFromMemory(assets::fonts_DejaVuSansMono_ttf, sizeof assets::fonts_DejaVuSansMono_ttf);
 	return tmp;
 }());

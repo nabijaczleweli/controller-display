@@ -23,28 +23,29 @@
 include configMakefile
 
 
-LDDLLS := $(OS_LD_LIBS) assets fmt whereami++
-LDAR := $(LNCXXAR) $(foreach l,$(OBJDIR)assets $(foreach l,fmt SFML/lib whereami-cpp,$(BLDDIR)$(l)),-L$(l)) $(foreach dll,$(LDDLLS),-l$(dll))
-INCAR := $(foreach l,$(foreach l,cereal whereami-cpp,$(l)/include),-isystemext/$(l)) $(foreach l,fmt SFML,-isystem$(BLDDIR)$(l)/include) -I$(BLDDIR)include
-VERAR := $(foreach l,CONTROLLER_DISPLAY CEREAL WHEREAMI_CPP,-D$(l)_VERSION='$($(l)_VERSION)')
+LDDLLS := $(OS_LD_LIBS) assets fmt whereami++ yaml-cpp
+LDAR := $(LNCXXAR) $(foreach l,$(OBJDIR)assets $(foreach l,fmt SFML/lib whereami-cpp yaml-cpp,$(BLDDIR)$(l)),-L$(l)) $(foreach dll,$(LDDLLS),-l$(dll))
+INCAR := $(foreach l,$(foreach l,cereal whereami-cpp yaml-cpp,$(l)/include),-isystemext/$(l)) $(foreach l,fmt SFML,-isystem$(BLDDIR)$(l)/include) -I$(BLDDIR)include
+VERAR := $(foreach l,CONTROLLER_DISPLAY CEREAL WHEREAMI_CPP YAML_CPP,-D$(l)_VERSION='$($(l)_VERSION)')
 ASSETS := $(foreach l,$(sort $(wildcard $(ASSETDIR)* $(ASSETDIR)**/* $(ASSETDIR)**/**/* $(ASSETDIR)**/**/**/*)),$(if $(findstring directory,$(shell file $(l))),,$(l)))
 SOURCES := $(sort $(wildcard src/*.cpp src/**/*.cpp src/**/**/*.cpp src/**/**/**/*.cpp))
 HEADERS := $(sort $(wildcard src/*.hpp src/**/*.hpp src/**/**/*.hpp src/**/**/**/*.hpp))
 
-.PHONY : all clean assets exe fmt sfml whereami-cpp
+.PHONY : all clean assets exe fmt sfml whereami-cpp yaml-cpp
 .SECONDARY :
 
 
-all : assets fmt sfml whereami-cpp exe
+all : assets fmt sfml whereami-cpp yaml-cpp exe
 
 clean :
 	rm -rf $(OUTDIR)
 
 assets : $(BLDDIR)include/assets.hpp $(OBJDIR)assets/libassets$(ARCH)
-exe : fmt whereami-cpp $(OUTDIR)controller-display$(EXE)
+exe : fmt sfml whereami-cpp yaml-cpp $(OUTDIR)controller-display$(EXE)
 fmt : $(BLDDIR)fmt/libfmt$(ARCH) $(BLDDIR)fmt/include/fmt/format.h
 sfml : $(BLDDIR)SFML/lib/libsfml-system-s$(ARCH)
 whereami-cpp : $(BLDDIR)whereami-cpp/libwhereami++$(ARCH)
+yaml-cpp : $(BLDDIR)yaml-cpp/libyaml-cpp$(ARCH)
 
 
 $(OUTDIR)controller-display$(EXE) : $(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,$(OBJ),$(SOURCES))) $(OS_OBJS)
@@ -79,6 +80,10 @@ $(BLDDIR)SFML/lib/libsfml-system-s$(ARCH) : ext/SFML/CMakeLists.txt
 $(BLDDIR)whereami-cpp/libwhereami++$(ARCH) : ext/whereami-cpp/Makefile
 	$(MAKE) -C$(dir $^) BUILD=$(abspath $(dir $@)) stlib
 
+$(BLDDIR)yaml-cpp/libyaml-cpp$(ARCH) : $(patsubst ext/yaml-cpp/src/%.cpp,$(BLDDIR)yaml-cpp/obj/%$(OBJ),$(wildcard ext/yaml-cpp/src/*.cpp))
+	@mkdir -p $(dir $@)
+	$(AR) crs $@ $^
+
 $(OBJDIR)controller-display$(OBJ) : controller-display.rc
 	@mkdir -p $(dir $@)
 	(echo '#define CONTROLLER_DISPLAY_VERSION_TEXT $(CONTROLLER_DISPLAY_VERSION)' && cat $^) | windres -DCONTROLLER_DISPLAY_VERSION_RAW='"$(shell echo $(CONTROLLER_DISPLAY_VERSION) | sed s/\\./,/g),0"' -o$@
@@ -109,3 +114,7 @@ $(OBJDIR)assets/%$(OBJ) : $(OBJDIR)assets/%.cpp
 $(BLDDIR)fmt/obj/%$(OBJ) : ext/fmt/fmt/%.cc
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXAR) -Iext/fmt -c -o$@ $^
+
+$(BLDDIR)yaml-cpp/obj/%$(OBJ) : ext/yaml-cpp/src/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXAR) -Iext/yaml-cpp/include -c -o$@ $^

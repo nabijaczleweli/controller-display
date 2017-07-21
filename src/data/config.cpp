@@ -53,7 +53,8 @@ namespace config_subcategories {
 			SFML << "SFML version " << SFML_VERSION_MAJOR << '.' << SFML_VERSION_MINOR << '.' << SFML_VERSION_PATCH << " found at https://sfml-dev.org";
 			archive(cereal::make_nvp("cereal", "version "s + CEREAL_VERSION + ", found at https://uscilab.github.io/cereal"), cereal::make_nvp("fmt", fmt.str()),
 			        cereal::make_nvp("SFML", SFML.str()),
-			        cereal::make_nvp("whereami-cpp", "version "s + WHEREAMI_CPP_VERSION + ", found at https://github.com/nabijaczleweli/whereami-cpp"));
+			        cereal::make_nvp("whereami-cpp", "version "s + WHEREAMI_CPP_VERSION + ", found at https://github.com/nabijaczleweli/whereami-cpp"),
+			        cereal::make_nvp("yaml-cpp", "commit "s + YAML_CPP_VERSION + ", found at https://github.com/jbeder/yaml-cpp"));
 		}
 
 		template <class Archive>

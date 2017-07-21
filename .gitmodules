@@ -13,3 +13,6 @@
 [submodule "ext/SFML"]
 	path = ext/SFML
 	url = https://github.com/SFML/SFML
+[submodule "ext/yaml-cpp"]
+	path = ext/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git

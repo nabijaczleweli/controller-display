@@ -16,3 +16,10 @@
 [submodule "ext/yaml-cpp"]
 	path = ext/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "ext/optional-lite"]
+	path = ext/optional-lite
+	url = https://github.com/martinmoene/optional-lite
+	branch = v2.1.0
+[submodule "ext/variant-lite"]
+	path = ext/variant-lite
+	url = https://github.com/martinmoene/variant-lite

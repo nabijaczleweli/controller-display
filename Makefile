@@ -25,25 +25,26 @@ include configMakefile
 
 LDDLLS := $(OS_LD_LIBS) assets fmt whereami++ yaml-cpp
 LDAR := $(LNCXXAR) $(foreach l,$(OBJDIR)assets $(foreach l,fmt SFML/lib whereami-cpp yaml-cpp,$(BLDDIR)$(l)),-L$(l)) $(foreach dll,$(LDDLLS),-l$(dll))
-INCAR := $(foreach l,$(foreach l,cereal whereami-cpp yaml-cpp,$(l)/include),-isystemext/$(l)) $(foreach l,fmt SFML,-isystem$(BLDDIR)$(l)/include) -I$(BLDDIR)include
-VERAR := $(foreach l,CONTROLLER_DISPLAY CEREAL WHEREAMI_CPP YAML_CPP,-D$(l)_VERSION='$($(l)_VERSION)')
+INCAR := $(foreach l,$(foreach l,cereal optional-lite whereami-cpp yaml-cpp,$(l)/include),-isystemext/$(l)) $(foreach l,fmt SFML variant-lite,-isystem$(BLDDIR)$(l)/include) -I$(BLDDIR)include
+VERAR := $(foreach l,CONTROLLER_DISPLAY CEREAL VARIANT_LITE WHEREAMI_CPP YAML_CPP,-D$(l)_VERSION='$($(l)_VERSION)')
 ASSETS := $(foreach l,$(sort $(wildcard $(ASSETDIR)* $(ASSETDIR)**/* $(ASSETDIR)**/**/* $(ASSETDIR)**/**/**/*)),$(if $(findstring directory,$(shell file $(l))),,$(l)))
 SOURCES := $(sort $(wildcard src/*.cpp src/**/*.cpp src/**/**/*.cpp src/**/**/**/*.cpp))
 HEADERS := $(sort $(wildcard src/*.hpp src/**/*.hpp src/**/**/*.hpp src/**/**/**/*.hpp))
 
-.PHONY : all clean assets exe fmt sfml whereami-cpp yaml-cpp
+.PHONY : all clean assets exe fmt sfml variant-lite whereami-cpp yaml-cpp
 .SECONDARY :
 
 
-all : assets fmt sfml whereami-cpp yaml-cpp exe
+all : assets fmt sfml variant-lite whereami-cpp yaml-cpp exe
 
 clean :
 	rm -rf $(OUTDIR)
 
 assets : $(BLDDIR)include/assets.hpp $(OBJDIR)assets/libassets$(ARCH)
-exe : fmt sfml whereami-cpp yaml-cpp $(OUTDIR)controller-display$(EXE)
+exe : fmt variant-lite sfml whereami-cpp yaml-cpp $(OUTDIR)controller-display$(EXE)
 fmt : $(BLDDIR)fmt/libfmt$(ARCH) $(BLDDIR)fmt/include/fmt/format.h
 sfml : $(BLDDIR)SFML/lib/libsfml-system-s$(ARCH)
+variant-lite : $(BLDDIR)variant-lite/include/nonstd/variant.hpp
 whereami-cpp : $(BLDDIR)whereami-cpp/libwhereami++$(ARCH)
 yaml-cpp : $(BLDDIR)yaml-cpp/libyaml-cpp$(ARCH)
 
@@ -76,6 +77,10 @@ $(BLDDIR)SFML/lib/libsfml-system-s$(ARCH) : ext/SFML/CMakeLists.txt
 	@mkdir -p $(abspath $(dir $@)../build)
 	cd $(abspath $(dir $@)../build) && $(INCCMAKEAR) $(LNCMAKEAR) $(CMAKE) -DBUILD_SHARED_LIBS=FALSE -DCMAKE_INSTALL_PREFIX:PATH="$(abspath $(dir $@)..)" $(abspath $(dir $^)) -GNinja
 	cd $(abspath $(dir $@)../build) && $(NINJA) install
+
+$(BLDDIR)variant-lite/include/nonstd/variant.hpp : ext/variant-lite/include/nonstd/variant.hpp
+	@mkdir -p $(dir $@)
+	cp $^ $@
 
 $(BLDDIR)whereami-cpp/libwhereami++$(ARCH) : ext/whereami-cpp/Makefile
 	$(MAKE) -C$(dir $^) BUILD=$(abspath $(dir $@)) stlib

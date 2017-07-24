@@ -23,19 +23,32 @@
 #include "main_app_screen.hpp"
 #include "../../../data/container.hpp"
 #include "../../application.hpp"
+#include "assets.hpp"
+#include <sstream>
+
+
+static std::unique_ptr<layout> default_layout() {
+	std::istringstream ss(assets::presets_layout_default_yml_s);
+	auto loaded = layout::load_stream(ss);
+
+	std::unique_ptr<layout> out;
+	nonstd::get<std::unique_ptr<layout>>(loaded).swap(out);
+	return out;
+}
 
 
 void main_app_screen::setup() {
 	screen::setup();
+	app.resize(cur_layout->size());
 }
 
 int main_app_screen::loop() {
-	for_each(keys.begin(), keys.end(), [](auto && k) { k.tick(); });
+	cur_layout->tick();
 	return 0;
 }
 
 int main_app_screen::draw() {
-	for_each(keys.begin(), keys.end(), [&](auto && k) { app.window.draw(k); });
+	app.window.draw(*cur_layout);
 	return 0;
 }
 
@@ -43,9 +56,4 @@ int main_app_screen::handle_event(const sf::Event & event) {
 	return screen::handle_event(event);
 }
 
-main_app_screen::main_app_screen(application & theapp) : screen(theapp), keys{key("a"), key("Num+"), key("Up"), key("~"), key("Control")} {
-	keys[1].setPosition(70, 0);
-	keys[2].setPosition(140, 0);
-	keys[3].setPosition(210, 0);
-	keys[4].setPosition(280, 0);
-}
+main_app_screen::main_app_screen(application & theapp) : screen(theapp), cur_layout(default_layout()) {}

@@ -1,0 +1,5 @@
+character-size: 40
+label: "#101010"
+unclicked: "#D8D8D8"
+clicked: "#F2F2F2"
+outline: black

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2017 nabijaczleweli
+// Copyright (c) 2016 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -24,26 +24,9 @@
 
 
 #include <SFML/Graphics.hpp>
-#include "../data/key_data.hpp"
+#include <string>
+#include <nonstd/optional.hpp>
 
 
-struct colour_theme;
-
-class key : public sf::Drawable, public sf::Transformable {
-private:
-	const keyboard_key_data_t * data;
-	const colour_theme * theme;
-
-	sf::Text label;
-	sf::RectangleShape background;
-
-
-public:
-	key(const std::string & key_id);
-	key(const std::string & key_id, const colour_theme & theme);
-
-	void tick();
-
-	sf::FloatRect global_bounds() const;
-	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
-};
+// Parse a https://www.w3.org/TR/css3-color
+nonstd::optional<sf::Color> parse_colour(std::string from);

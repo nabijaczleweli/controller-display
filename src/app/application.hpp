@@ -26,6 +26,7 @@
 #include "screens/screen.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <nonstd/optional.hpp>
 #include <memory>
 
 
@@ -36,6 +37,8 @@ private:
 
 	std::unique_ptr<screen> current_screen;
 	std::unique_ptr<screen> temp_screen;
+
+	nonstd::optional<sf::Vector2u> new_size;
 
 	sf::RenderWindow window;
 
@@ -48,6 +51,7 @@ public:
 
 
 	int run();
+	void resize(sf::Vector2u to);
 
 	template <class T, class... A>
 	inline void schedule_screen(A &&... args) {

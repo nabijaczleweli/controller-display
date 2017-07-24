@@ -22,38 +22,45 @@
 
 #include "key.hpp"
 #include "../data/container.hpp"
+#include "../data/layout.hpp"
 #include <algorithm>
 
 
-static const sf::Color label_colour(0x10, 0x10, 0x10);
-static const sf::Color background_colour_clicked(0xF2, 0xF2, 0xF2);
-static const sf::Color background_colour_unclicked(0xD8, 0xD8, 0xD8);
+key::key(const std::string & key_id) : key(key_id, colour_theme::classic) {}
 
-
-key::key(const std::string & key_id) : data(keyboard_key_data().at(key_id)), label(data.label, font_default, 40) {
+key::key(const std::string & key_id, const colour_theme & thm)
+      : data(&keyboard_key_data().at(key_id)), theme(&thm), label(data->label, font_default, theme->character_size) {
 	auto && label_bounds          = label.getGlobalBounds();
-	const float background_height  = label.getCharacterSize() + label.getCharacterSize() / 2;
-	const float background_width   = data.proportional ? background_height : label.getCharacterSize() + label_bounds.width;
+	const float background_height = theme->character_size + theme->character_size / 2;
+	const float background_width  = data->proportional ? background_height : theme->character_size + label_bounds.width;
 
 	background.setSize({background_width, background_height});
 	background.setOutlineThickness(-1);
-	background.setOutlineColor(sf::Color::Black);
+	background.setOutlineColor(theme->outline);
 
-	label.setFillColor(label_colour);
-	label.setPosition(background_width / 2 - label_bounds.width / 2, label.getCharacterSize() / 4 / 2);
+	label.setFillColor(theme->label);
+	label.setPosition(background_width / 2 - label_bounds.width / 2, theme->character_size / 4 / 2);
 }
 
 void key::tick() {
-	bool shift_ok = !data.need_shift && !data.need_no_shift;
+	bool shift_ok = !data->need_shift && !data->need_no_shift;
 	if(!shift_ok) {
 		const auto shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-		shift_ok         = (data.need_shift && shift) || (data.need_no_shift && !shift);
+		shift_ok         = (data->need_shift && shift) || (data->need_no_shift && !shift);
 	}
 
-	if(shift_ok && std::any_of(data.keycodes.begin(), data.keycodes.end(), sf::Keyboard::isKeyPressed))
-		background.setFillColor(background_colour_clicked);
+	if(shift_ok && std::any_of(data->keycodes.begin(), data->keycodes.end(), sf::Keyboard::isKeyPressed))
+		background.setFillColor(theme->clicked);
 	else
-		background.setFillColor(background_colour_unclicked);
+		background.setFillColor(theme->unclicked);
+}
+
+sf::FloatRect key::global_bounds() const {
+	auto bgbounds = background.getGlobalBounds();
+	auto && pos   = getPosition();
+	bgbounds.left = pos.x;
+	bgbounds.top  = pos.y;
+	return bgbounds;
 }
 
 void key::draw(sf::RenderTarget & target, sf::RenderStates states) const {

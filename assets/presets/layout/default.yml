@@ -1,0 +1,8 @@
+grid: 3x2
+keys:
+  - spacer
+  - keyboard.w
+  - spacer
+  - keyboard.a
+  - keyboard.s
+  - keyboard.d

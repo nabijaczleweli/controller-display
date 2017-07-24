@@ -23,15 +23,15 @@
 #pragma once
 
 
-#include "../../../draw/key.hpp"
+#include "../../../data/layout.hpp"
 #include "../screen.hpp"
 #include <SFML/Window.hpp>
-#include <vector>
 
 
 class main_app_screen : public screen {
 private:
-	std::vector<key> keys;
+	std::unique_ptr<layout> cur_layout;
+
 
 public:
 	virtual void setup() override;

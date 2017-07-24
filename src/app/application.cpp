@@ -21,9 +21,9 @@
 
 
 #include "application.hpp"
-#include "assets.hpp"
 #include "../data/container.hpp"
 #include "../util/monitor.hpp"
+#include "assets.hpp"
 #include <SFML/System.hpp>
 #include <algorithm>
 #include <thread>
@@ -50,11 +50,21 @@ int application::run() {
 	return loop();
 }
 
+void application::resize(sf::Vector2u to) {
+	new_size = {to};
+}
+
 int application::loop() {
 	while(window.isOpen()) {
 		while(temp_screen) {
 			current_screen = move(temp_screen);
 			current_screen->setup();
+		}
+
+		if(new_size) {
+			window.setSize(*new_size);
+			window.setView(sf::View({0, 0, static_cast<float>(new_size->x), static_cast<float>(new_size->y)}));
+			new_size = nonstd::nullopt;
 		}
 
 		if(const int i = current_screen->loop())

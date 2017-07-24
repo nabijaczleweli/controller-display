@@ -23,27 +23,40 @@
 #pragma once
 
 
+#include "../draw/key.hpp"
 #include <SFML/Graphics.hpp>
-#include "../data/key_data.hpp"
+#include <istream>
+#include <cstdint>
+#include <memory>
+#include <nonstd/variant.hpp>
 
 
-struct colour_theme;
+struct colour_theme {
+	static colour_theme classic;  // Which is a pretentious way of saying "default" which is a keyword
 
-class key : public sf::Drawable, public sf::Transformable {
+
+	std::size_t character_size;
+	sf::Color label;
+	sf::Color unclicked;
+	sf::Color clicked;
+	sf::Color outline;
+};
+
+class layout : public sf::Drawable {
 private:
-	const keyboard_key_data_t * data;
-	const colour_theme * theme;
+	colour_theme theme;
+	std::vector<key> keyboard_keys;
+	std::size_t grid_width;
+	std::size_t grid_height;
 
-	sf::Text label;
-	sf::RectangleShape background;
+	layout() = default;
 
 
 public:
-	key(const std::string & key_id);
-	key(const std::string & key_id, const colour_theme & theme);
+	static nonstd::variant<std::unique_ptr<layout>, std::string> load_stream(std::istream & strim);
+
+	sf::Vector2u size();
 
 	void tick();
-
-	sf::FloatRect global_bounds() const;
 	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 };

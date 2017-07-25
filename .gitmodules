@@ -23,3 +23,6 @@
 [submodule "ext/variant-lite"]
 	path = ext/variant-lite
 	url = https://github.com/martinmoene/variant-lite
+[submodule "ext/tinyfiledialogs"]
+	path = ext/tinyfiledialogs
+	url = https://git.code.sf.net/p/tinyfiledialogs/code

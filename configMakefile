@@ -25,7 +25,7 @@ ifeq "$(OS)" "Windows_NT"
 	DLL := .dll
 	PIC :=
 #	OS_LD_ARGS := -Wl,--subsystem,windows
-	OS_LD_LIBS := opengl32 winmm gdi32
+	OS_LD_LIBS := opengl32 winmm gdi32 comdlg32 ole32
 else
 	EXE :=
 	DLL := .so

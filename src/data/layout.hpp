@@ -33,6 +33,7 @@
 
 struct colour_theme {
 	static colour_theme classic;  // Which is a pretentious way of saying "default" which is a keyword
+	static colour_theme dark;
 
 
 	std::size_t character_size;

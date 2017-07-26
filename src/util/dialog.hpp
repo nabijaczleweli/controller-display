@@ -23,20 +23,9 @@
 #pragma once
 
 
-#include <string>
+#include <vector>
+#include <nonstd/optional.hpp>
+#include <SFML/System.hpp>
 
 
-class config {
-public:
-	bool vsync       = true;
-	unsigned int FPS = 60;
-
-	float new_layout_time = 2.5;
-
-
-	config(std::string && path);
-	~config();
-
-private:
-	std::string path;
-};
+nonstd::optional<sf::String> pick_file_dialog(const char * exts_name, const std::vector<const char *> & exts);

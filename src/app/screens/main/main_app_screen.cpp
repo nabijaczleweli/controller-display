@@ -22,8 +22,12 @@
 
 #include "main_app_screen.hpp"
 #include "../../../data/container.hpp"
+#include "../../../util/dialog.hpp"
 #include "../../application.hpp"
 #include "assets.hpp"
+#include <fstream>
+#include <iostream>
+#include <iterator>
 #include <sstream>
 
 
@@ -44,16 +48,72 @@ void main_app_screen::setup() {
 
 int main_app_screen::loop() {
 	cur_layout->tick();
+
+	if(layout_info.second) {
+		auto && text_bounds    = layout_info.first.getGlobalBounds();
+		auto && window_size    = app.window.getSize();
+		const auto full_length = app_configuration.new_layout_time * application::effective_FPS();
+		const auto fade_length = full_length / 5;
+
+		if(layout_info.second >= full_length - fade_length) {
+			const auto progress = static_cast<double>(full_length - layout_info.second) / fade_length;
+			layout_info.first.setPosition(window_size.x - text_bounds.width, (progress * progress - 1.) * text_bounds.height);
+		} else if(layout_info.second <= fade_length) {
+			const auto progress = static_cast<double>(layout_info.second) / fade_length;
+			layout_info.first.setPosition(window_size.x - text_bounds.width + (1. - progress * progress) * text_bounds.width, 0);
+		}
+
+		--layout_info.second;
+	}
+
 	return 0;
 }
 
 int main_app_screen::draw() {
 	app.window.draw(*cur_layout);
+	if(layout_info.second)
+		app.window.draw(layout_info.first);
 	return 0;
 }
 
 int main_app_screen::handle_event(const sf::Event & event) {
-	return screen::handle_event(event);
+	if(const auto i = screen::handle_event(event))
+		return i;
+
+	if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::O) {
+		auto file = pick_file_dialog("YAML files", {"*.YML", "*.YAML"});
+		if(file) {
+			std::ifstream infile(*file);
+
+			auto new_layout = layout::load_stream(infile);
+			if(nonstd::holds_alternative<std::string>(new_layout))
+				layout_info.first.setString(nonstd::get<std::string>(new_layout));
+			else {
+				file->erase(0,
+				            std::find_if(
+				                std::make_reverse_iterator(file->end()), std::make_reverse_iterator(file->begin()),
+				                [](auto c) {
+					                return c == '/' || c == '\\';
+					              }).base() -
+				                file->begin());
+				const auto last_dot = std::find(std::make_reverse_iterator(file->end()), std::make_reverse_iterator(file->begin()), '.').base();
+				if(last_dot != file->begin())
+					file->erase(last_dot - file->begin() - 1, file->getSize());
+
+				layout_info.first.setString(*file);
+				nonstd::get<std::unique_ptr<layout>>(new_layout).swap(cur_layout);
+				app.resize(cur_layout->size());
+			}
+			layout_info.second = app_configuration.new_layout_time * application::effective_FPS();
+		}
+	}
+
+	return 0;
 }
 
-main_app_screen::main_app_screen(application & theapp) : screen(theapp), cur_layout(default_layout()) {}
+main_app_screen::main_app_screen(application & theapp)
+      : screen(theapp), cur_layout(default_layout()),
+        layout_info({"default", font_default, 15}, app_configuration.new_layout_time * application::effective_FPS()) {
+	layout_info.first.setOutlineThickness(1);
+	layout_info.first.setOutlineColor(sf::Color::Black);
+}

@@ -31,6 +31,7 @@
 class main_app_screen : public screen {
 private:
 	std::unique_ptr<layout> cur_layout;
+	std::pair<sf::Text, std::size_t> layout_info;
 
 
 public:

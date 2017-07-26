@@ -41,13 +41,11 @@ static nonstd::optional<std::string> parse_colour_theme(colour_theme & into, YAM
 static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, std::size_t &> into, YAML::Node from);
 static nonstd::optional<std::string> parse_keyset(std::vector<key> & into, YAML::Node from, std::size_t grid_width, const colour_theme & theme);
 static bool try_preset(colour_theme & thm, const std::string & preset);
+static colour_theme load_preset_theme(const char * preset);
 
 
-colour_theme colour_theme::classic = []() {
-	colour_theme theme;
-	parse_colour_theme(theme, YAML::Load(assets::presets_colour_theme_default_yml_s));
-	return theme;
-}();
+colour_theme colour_theme::classic = load_preset_theme(assets::presets_colour_theme_default_yml_s);
+colour_theme colour_theme::dark    = load_preset_theme(assets::presets_colour_theme_dark_yml_s);
 
 
 nonstd::variant<std::unique_ptr<layout>, std::string> layout::load_stream(std::istream & strim) {
@@ -114,6 +112,7 @@ static nonstd::optional<std::string> parse_colour_theme(colour_theme & into, YAM
 			if(char_size) {
 				if(!char_size.IsScalar())
 					return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Invalid theme.character-size key type");
+				errno         = 0;
 				const auto cs = std::strtoull(char_size.Scalar().c_str(), nullptr, 0);
 				if(!cs || errno == ERANGE)
 					return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Key theme.character-size not an integer");
@@ -145,6 +144,7 @@ static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, st
 	switch(from.Type()) {
 		case YAML::NodeType::Scalar: {
 			char * h_s = nullptr;
+			errno      = 0;
 			into.first = std::strtoull(from.Scalar().c_str(), &h_s, 10);
 			if(!into.first || errno == ERANGE)
 				return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Grid key not in WIDTHxHEIGHT format -- unparsable width");
@@ -152,6 +152,7 @@ static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, st
 			if(*h_s != 'x')
 				return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Grid key not in WIDTHxHEIGHT format -- missing separator");
 
+			errno       = 0;
 			into.second = std::strtoull(h_s + 1, nullptr, 10);
 			if(!into.second || errno == ERANGE)
 				return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Grid key not in WIDTHxHEIGHT format -- unparsable height");
@@ -164,6 +165,7 @@ static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, st
 					return {"Missing grid."s + wh.first + " key"};
 				if(!size.IsScalar())
 					return {"Invalid grid."s + wh.first + " key type"};
+				errno     = 0;
 				wh.second = std::strtoull(size.Scalar().c_str(), nullptr, 0);
 				if(!wh.second || errno == ERANGE)
 					return {"Key grid."s + wh.first + " not an integer"};
@@ -226,8 +228,16 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & into, YAML:
 static bool try_preset(colour_theme & thm, const std::string & preset) {
 	if(preset == "default" || preset == "classic")
 		thm = colour_theme::classic;
+	else if(preset == "dark")
+		thm = colour_theme::dark;
 	else
 		return false;
 
 	return true;
+}
+
+static colour_theme load_preset_theme(const char * preset) {
+	colour_theme theme;
+	parse_colour_theme(theme, YAML::Load(preset));
+	return theme;
 }

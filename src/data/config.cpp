@@ -29,6 +29,7 @@
 #include <fstream>
 #include <nonstd/optional.hpp>
 #include <sstream>
+#include <tinyfiledialogs.h>
 
 
 using namespace std::literals;
@@ -45,6 +46,15 @@ namespace config_subcategories {
 		}
 	};
 
+	struct cosmetics {
+		float & new_layout_time;
+
+		template <class Archive>
+		void serialize(Archive & archive) {
+			archive(cereal::make_nvp("new_layout_time", new_layout_time));
+		}
+	};
+
 	struct dependencies {
 		template <class Archive>
 		void save(Archive & archive) const {
@@ -56,6 +66,7 @@ namespace config_subcategories {
 			        cereal::make_nvp("fmt", fmt.str()),
 			        cereal::make_nvp("optional-lite", "version "s + optional_lite_VERSION + ", found at https://github.com/martinmoene/optional-lite"),
 			        cereal::make_nvp("SFML", SFML.str()),
+			        cereal::make_nvp("tinyfiledialogs", "version "s + tinyfd_version + ", found at https://sourceforge.net/p/tinyfiledialogs"),
 			        cereal::make_nvp("variant-lite", "commit "s + VARIANT_LITE_VERSION + ", found at https://github.com/martinmoene/variant-lite"),
 			        cereal::make_nvp("whereami-cpp", "version "s + WHEREAMI_CPP_VERSION + ", found at https://github.com/nabijaczleweli/whereami-cpp"),
 			        cereal::make_nvp("yaml-cpp", "commit "s + YAML_CPP_VERSION + ", found at https://github.com/jbeder/yaml-cpp"));
@@ -70,6 +81,7 @@ template <class Archive>
 void serialize(Archive & archive, config & cc) {
 	archive(
 	    cereal::make_nvp("display", config_subcategories::display{cc.vsync, cc.FPS}),
+	    cereal::make_nvp("cosmetics", config_subcategories::cosmetics{cc.new_layout_time}),
 	    cereal::make_nvp("‌controller-display", "version "s + CONTROLLER_DISPLAY_VERSION + ", found at https://github.com/nabijaczleweli/controller-display"),
 	    cereal::make_nvp("‌‌dependencies", config_subcategories::dependencies{}));
 }

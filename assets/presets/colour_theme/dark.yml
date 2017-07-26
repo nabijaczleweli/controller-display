@@ -1,0 +1,5 @@
+character-size: 40
+label: gray
+unclicked: "#272727"
+clicked: "#080808"
+outline: rgba(39, 39, 39, 127)

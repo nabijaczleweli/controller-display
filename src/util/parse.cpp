@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2016 nabijaczleweli
+// Copyright (c) 2017 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -221,7 +221,7 @@ nonstd::optional<sf::Color> parse_colour(std::string from) {
 		auto func = from.substr(0, lparen);
 
 		std::vector<std::string> params;
-		for(auto tkn = std::strtok(&from[0], ","); tkn; tkn = std::strtok(NULL, ","))
+		for(auto tkn = std::strtok(&from[0] + lparen + 1, ","); tkn; tkn = std::strtok(NULL, ","))
 			params.emplace_back(tkn);
 
 		auto alpha = 1.f;

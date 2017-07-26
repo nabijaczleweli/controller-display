@@ -20,23 +20,22 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#pragma once
-
-
+#include "dialog.hpp"
+#include <cstring>
+#include <iterator>
 #include <string>
+#include <tinyfiledialogs.h>
 
 
-class config {
-public:
-	bool vsync       = true;
-	unsigned int FPS = 60;
+nonstd::optional<sf::String> pick_file_dialog(const char * exts_name, const std::vector<const char *> & exts) {
+#ifdef _WIN32
+	tinyfd_winUtf8 = 1;
+#endif
 
-	float new_layout_time = 2.5;
-
-
-	config(std::string && path);
-	~config();
-
-private:
-	std::string path;
-};
+	if(const auto res = tinyfd_openFileDialog(nullptr, nullptr, 1, exts.data(), exts_name, false)) {
+		std::basic_string<sf::Uint32> buf;
+		sf::Utf8::toUtf32(res, res + std::strlen(res), std::back_inserter(buf));
+		return nonstd::optional<sf::String>(nonstd::in_place, buf);
+	} else
+		return nonstd::nullopt;
+}

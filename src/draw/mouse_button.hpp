@@ -23,43 +23,33 @@
 #pragma once
 
 
-#include "../draw/key.hpp"
-#include "../draw/mouse_button.hpp"
+#include "../data/key_data.hpp"
+#include "bezier_curve.hpp"
 #include <SFML/Graphics.hpp>
-#include <cstdint>
-#include <istream>
-#include <memory>
-#include <nonstd/variant.hpp>
 
 
-struct colour_theme {
-	static colour_theme classic;  // Which is a pretentious way of saying "default" which is a keyword
-	static colour_theme dark;
+struct colour_theme;
 
-
-	std::size_t character_size;
-	sf::Color label;
-	sf::Color unclicked;
-	sf::Color clicked;
-	sf::Color outline;
-};
-
-class layout : public sf::Drawable {
+class mouse_button : public sf::Drawable, public sf::Transformable {
 private:
-	colour_theme theme;
-	std::vector<key> keyboard_keys;
-	std::vector<mouse_button> mouse_buttons;
-	std::size_t grid_width;
-	std::size_t grid_height;
+	const mouse_button_data_t * data;
+	const colour_theme * theme;
 
-	layout() = default;
+	sf::Text label;
+
+	bezier_curve fill;
+	sf::Vertex fill_fill[3];
+
+	bezier_curve outline;
+	sf::Vertex outline_fill[3];
 
 
 public:
-	static nonstd::variant<std::unique_ptr<layout>, std::string> load_stream(std::istream & strim);
-
-	sf::Vector2u size();
+	mouse_button(const std::string & button_id);
+	mouse_button(const std::string & button_id, const colour_theme & theme);
 
 	void tick();
+
+	sf::FloatRect global_bounds() const;
 	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 };

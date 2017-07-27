@@ -26,7 +26,6 @@
 #include "../../application.hpp"
 #include "assets.hpp"
 #include <fstream>
-#include <iostream>
 #include <iterator>
 #include <sstream>
 

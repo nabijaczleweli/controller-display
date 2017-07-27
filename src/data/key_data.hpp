@@ -25,9 +25,14 @@
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
+
+
+enum class mouse_button_direction : std::uint8_t { left, right, other };
 
 
 template <class code_t>
@@ -42,6 +47,8 @@ struct key_data {
 };
 
 using keyboard_key_data_t = key_data<std::vector<sf::Keyboard::Key>>;
+using mouse_button_data_t = key_data<std::pair<sf::Mouse::Button, mouse_button_direction>>;
 
 
-const std::unordered_map<std::string, key_data<std::vector<sf::Keyboard::Key>>> & keyboard_key_data();
+const std::unordered_map<std::string, keyboard_key_data_t> & keyboard_key_data();
+const std::unordered_map<std::string, mouse_button_data_t> & mouse_button_data();

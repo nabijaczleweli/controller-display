@@ -24,6 +24,7 @@
 
 
 #include "../../../data/layout.hpp"
+#include "../../../draw/mouse_button.hpp"
 #include "../screen.hpp"
 #include <SFML/Window.hpp>
 

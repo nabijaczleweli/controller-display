@@ -25,8 +25,6 @@
 
 using namespace std::literals;
 
-using keyboard_key_data_t = key_data<std::vector<sf::Keyboard::Key>>;
-
 
 const std::unordered_map<std::string, keyboard_key_data_t> & keyboard_key_data() {
 	static const std::unordered_map<std::string, keyboard_key_data_t> keys = []() {

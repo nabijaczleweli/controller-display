@@ -1,7 +1,12 @@
-grid: 3x2
+grid: 5x2
 keys:
+  - mouse.Left
+  - mouse.Right
   - spacer
   - keyboard.w
+  - spacer
+
+  - spacer
   - spacer
   - keyboard.a
   - keyboard.s

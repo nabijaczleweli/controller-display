@@ -28,7 +28,7 @@
 void screen::setup() {}
 
 int screen::handle_event(const sf::Event & event) {
-	if(event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+	if(event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.alt && event.key.code == sf::Keyboard::F4))
 		app.window.close();
 	else if(event.type == sf::Event::MouseButtonPressed)
 		app.window.requestFocus();

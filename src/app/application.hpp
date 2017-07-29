@@ -33,6 +33,7 @@
 class application {
 private:
 	friend screen;
+	friend class help_screen;
 	friend class main_app_screen;
 
 	std::unique_ptr<screen> current_screen;

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2017 nabijaczleweli
+// Copyright (c) 2016 nabijaczleweli
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -20,18 +20,28 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "dialog.hpp"
-#include "utf.hpp"
-#include <tinyfiledialogs.h>
+#ifndef _WIN32
 
 
-nonstd::optional<sf::String> pick_file_dialog(const char * exts_name, const std::vector<const char *> & exts) {
-#ifdef _WIN32
-	tinyfd_winUtf8 = 1;
-#endif
+#include "url.hpp"
 
-	if(const auto res = tinyfd_openFileDialog(nullptr, nullptr, 1, exts.data(), exts_name, false))
-		return {from_utf8(res)};
-	else
-		return nonstd::nullopt;
+
+#include <cstdlib>
+#include <cstring>
+#include <unistd.h>
+
+
+bool launch_browser(const char * address) {
+	const auto browser = std::getenv("BROWSER");
+	if(!browser || std::strlen(browser) == 0)
+		return false;
+
+	char * args[]{const_cast<char *>(address), nullptr};
+	if(!fork())
+		execvp(browser, args);
+
+	return true;
 }
+
+
+#endif

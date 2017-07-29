@@ -20,18 +20,29 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "dialog.hpp"
-#include "utf.hpp"
-#include <tinyfiledialogs.h>
+#pragma once
 
 
-nonstd::optional<sf::String> pick_file_dialog(const char * exts_name, const std::vector<const char *> & exts) {
-#ifdef _WIN32
-	tinyfd_winUtf8 = 1;
-#endif
+#include "../screen.hpp"
+#include <SFML/Graphics.hpp>
+#include <nonstd/optional.hpp>
+#include <vector>
+#include <tuple>
 
-	if(const auto res = tinyfd_openFileDialog(nullptr, nullptr, 1, exts.data(), exts_name, false))
-		return {from_utf8(res)};
-	else
-		return nonstd::nullopt;
-}
+
+class help_screen : public screen {
+private:
+	nonstd::optional<sf::String> saved_layout;
+	std::vector<std::tuple<sf::IntRect, sf::RectangleShape, std::string>> links;
+	sf::Text help_text;
+
+
+public:
+	virtual void setup() override;
+	virtual int loop() override;
+	virtual int draw() override;
+	virtual int handle_event(const sf::Event & event) override;
+
+	help_screen(application & theapp, nonstd::optional<sf::String> layout);
+	virtual ~help_screen() = default;
+};

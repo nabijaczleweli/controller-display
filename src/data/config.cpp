@@ -21,6 +21,7 @@
 
 
 #include "config.hpp"
+#include "../util/fmt.hpp"
 #include "container.hpp"
 #include <SFML/System.hpp>
 #include <cereal/archives/json.hpp>
@@ -58,14 +59,13 @@ namespace config_subcategories {
 	struct dependencies {
 		template <class Archive>
 		void save(Archive & archive) const {
-			std::ostringstream fmt, SFML;
-			fmt << "fmt version " << (FMT_VERSION - (FMT_VERSION % 10000)) / 10000 << '.' << ((FMT_VERSION - (FMT_VERSION % 100)) / 100) % 100 << '.'
-			    << FMT_VERSION % 100 << ", found at http://fmtlib.net";
-			SFML << "SFML version " << SFML_VERSION_MAJOR << '.' << SFML_VERSION_MINOR << '.' << SFML_VERSION_PATCH << " found at https://sfml-dev.org";
-			archive(cereal::make_nvp("cereal", "version "s + CEREAL_VERSION + ", found at https://uscilab.github.io/cereal"), cereal::make_nvp("fmt", fmt.str()),
-			        cereal::make_nvp("fmt", fmt.str()),
+			archive(cereal::make_nvp("cereal", "version "s + CEREAL_VERSION + ", found at https://uscilab.github.io/cereal"),
+			        cereal::make_nvp("fmt", fmt::format("fmt version {}, found at http://fmtlib.net",
+			                                            format_version{(FMT_VERSION - (FMT_VERSION % 10000)) / 10000,
+			                                                           ((FMT_VERSION - (FMT_VERSION % 100)) / 100) % 100, FMT_VERSION % 100})),
 			        cereal::make_nvp("optional-lite", "version "s + optional_lite_VERSION + ", found at https://github.com/martinmoene/optional-lite"),
-			        cereal::make_nvp("SFML", SFML.str()),
+			        cereal::make_nvp("SFML", fmt::format("SFML version {}, found at https://sfml-dev.org",
+			                                             format_version{SFML_VERSION_MAJOR, SFML_VERSION_MINOR, SFML_VERSION_PATCH})),
 			        cereal::make_nvp("tinyfiledialogs", "version "s + tinyfd_version + ", found at https://sourceforge.net/p/tinyfiledialogs"),
 			        cereal::make_nvp("variant-lite", "commit "s + VARIANT_LITE_VERSION + ", found at https://github.com/martinmoene/variant-lite"),
 			        cereal::make_nvp("whereami-cpp", "version "s + WHEREAMI_CPP_VERSION + ", found at https://github.com/nabijaczleweli/whereami-cpp"),

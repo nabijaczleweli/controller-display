@@ -25,6 +25,7 @@
 #include "../../../util/dialog.hpp"
 #include "../../application.hpp"
 #include "assets.hpp"
+#include "help_screen.hpp"
 #include <fstream>
 #include <iterator>
 #include <sstream>
@@ -40,9 +41,38 @@ static std::unique_ptr<layout> default_layout() {
 }
 
 
+void main_app_screen::load_layout() {
+	if(layout_src) {
+		auto file = *layout_src;
+		std::ifstream infile(file);
+
+		auto new_layout = layout::load_stream(infile);
+		if(nonstd::holds_alternative<std::string>(new_layout))
+			layout_info.first.setString(nonstd::get<std::string>(new_layout));
+		else {
+			file.erase(
+			    0,
+			    std::find_if(std::make_reverse_iterator(file.end()), std::make_reverse_iterator(file.begin()), [](auto c) { return c == '/' || c == '\\'; }).base() -
+			        file.begin());
+			const auto last_dot = std::find(std::make_reverse_iterator(file.end()), std::make_reverse_iterator(file.begin()), '.').base();
+			if(last_dot != file.begin())
+				file.erase(last_dot - file.begin() - 1, file.getSize());
+
+			layout_info.first.setString(file);
+			nonstd::get<std::unique_ptr<layout>>(new_layout).swap(cur_layout);
+			app.resize(cur_layout->size());
+		}
+	} else {
+		cur_layout = default_layout();
+		layout_info.first.setString("default");
+	}
+	app.resize(cur_layout->size());
+	layout_info.second = app_configuration.new_layout_time * application::effective_FPS();
+}
+
 void main_app_screen::setup() {
 	screen::setup();
-	app.resize(cur_layout->size());
+	load_layout();
 }
 
 int main_app_screen::loop() {
@@ -79,40 +109,33 @@ int main_app_screen::handle_event(const sf::Event & event) {
 	if(const auto i = screen::handle_event(event))
 		return i;
 
-	if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::O) {
-		auto file = pick_file_dialog("YAML files", {"*.YML", "*.YAML"});
-		if(file) {
-			std::ifstream infile(*file);
+	if(event.type == sf::Event::KeyPressed)
+		switch(event.key.code) {
+			case sf::Keyboard::O: {
+				auto file = pick_file_dialog("YAML files", {"*.YML", "*.YAML"});
+				if(file) {
+					layout_src = file;
+					load_layout();
+				}
+			} break;
 
-			auto new_layout = layout::load_stream(infile);
-			if(nonstd::holds_alternative<std::string>(new_layout))
-				layout_info.first.setString(nonstd::get<std::string>(new_layout));
-			else {
-				file->erase(0,
-				            std::find_if(
-				                std::make_reverse_iterator(file->end()), std::make_reverse_iterator(file->begin()),
-				                [](auto c) {
-					                return c == '/' || c == '\\';
-					              }).base() -
-				                file->begin());
-				const auto last_dot = std::find(std::make_reverse_iterator(file->end()), std::make_reverse_iterator(file->begin()), '.').base();
-				if(last_dot != file->begin())
-					file->erase(last_dot - file->begin() - 1, file->getSize());
+			case sf::Keyboard::Slash:
+				if(!event.key.shift)
+					break;
+				[[fallthrough]];
+			case sf::Keyboard::H:
+				app.schedule_screen<help_screen>(std::move(layout_src));
+				break;
 
-				layout_info.first.setString(*file);
-				nonstd::get<std::unique_ptr<layout>>(new_layout).swap(cur_layout);
-				app.resize(cur_layout->size());
-			}
-			layout_info.second = app_configuration.new_layout_time * application::effective_FPS();
+			default:
+				break;
 		}
-	}
 
 	return 0;
 }
 
-main_app_screen::main_app_screen(application & theapp)
-      : screen(theapp), cur_layout(default_layout()),
-        layout_info({"default", font_default, 15}, app_configuration.new_layout_time * application::effective_FPS()) {
+main_app_screen::main_app_screen(application & theapp, nonstd::optional<sf::String> layout_file)
+      : screen(theapp), layout_src(layout_file), layout_info({"", font_default, 15}, 0) {
 	layout_info.first.setOutlineThickness(1);
 	layout_info.first.setOutlineColor(sf::Color::Black);
 }

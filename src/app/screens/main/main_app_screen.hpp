@@ -27,12 +27,16 @@
 #include "../../../draw/mouse_button.hpp"
 #include "../screen.hpp"
 #include <SFML/Window.hpp>
+#include <nonstd/optional.hpp>
 
 
 class main_app_screen : public screen {
 private:
+	nonstd::optional<sf::String> layout_src;
 	std::unique_ptr<layout> cur_layout;
 	std::pair<sf::Text, std::size_t> layout_info;
+
+	void load_layout();
 
 
 public:
@@ -41,6 +45,6 @@ public:
 	virtual int draw() override;
 	virtual int handle_event(const sf::Event & event) override;
 
-	main_app_screen(application & theapp);
+	main_app_screen(application & theapp, nonstd::optional<sf::String> layout_file = nonstd::nullopt);
 	virtual ~main_app_screen() = default;
 };

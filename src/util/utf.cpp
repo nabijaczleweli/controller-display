@@ -20,18 +20,23 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "dialog.hpp"
 #include "utf.hpp"
-#include <tinyfiledialogs.h>
+#include <cstdint>
+#include <cstring>
+#include <iterator>
 
 
-nonstd::optional<sf::String> pick_file_dialog(const char * exts_name, const std::vector<const char *> & exts) {
-#ifdef _WIN32
-	tinyfd_winUtf8 = 1;
-#endif
+static sf::String from_utf8(const char * utf8, std::size_t length) {
+	std::basic_string<sf::Uint32> utf32;
+	sf::Utf8::toUtf32(utf8, utf8 + length, std::back_inserter(utf32));
+	return utf32;
+}
 
-	if(const auto res = tinyfd_openFileDialog(nullptr, nullptr, 1, exts.data(), exts_name, false))
-		return {from_utf8(res)};
-	else
-		return nonstd::nullopt;
+
+sf::String from_utf8(const char * utf8) {
+	return from_utf8(utf8, std::strlen(utf8));
+}
+
+sf::String from_utf8(const std::string & utf8) {
+	return from_utf8(utf8.c_str(), utf8.size());
 }

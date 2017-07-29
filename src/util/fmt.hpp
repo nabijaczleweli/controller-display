@@ -20,18 +20,18 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "dialog.hpp"
-#include "utf.hpp"
-#include <tinyfiledialogs.h>
+#pragma once
 
 
-nonstd::optional<sf::String> pick_file_dialog(const char * exts_name, const std::vector<const char *> & exts) {
-#ifdef _WIN32
-	tinyfd_winUtf8 = 1;
-#endif
+#include <fmt/format.h>
 
-	if(const auto res = tinyfd_openFileDialog(nullptr, nullptr, 1, exts.data(), exts_name, false))
-		return {from_utf8(res)};
-	else
-		return nonstd::nullopt;
+
+struct format_version {
+	unsigned int major;
+	unsigned int minor;
+	unsigned int patch;
+};
+
+inline void format_arg(fmt::BasicFormatter<char> & f, const char *&, const format_version & s) {
+	f.writer().write("{}.{}.{}", s.major, s.minor, s.patch);
 }

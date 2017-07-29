@@ -1,0 +1,18 @@
+controller-display {controller_display_version} – show the status of your keyboard/controller.
+
+Controls:
+  O   – load layout
+  H?  – show this screen
+  C   – configure
+  Esc – back one screen
+  Q   – quit
+
+Credit:
+  cereal {cereal_version} – https://uscilab.github.io/cereal
+  fmt {fmt_version} – http://fmtlib.net
+  optional-lite {optional_lite_version} – https://github.com/martinmoene/optional-lite
+  SFML {SFML_version} – https://sfml-dev.org
+  tinyfiledialogs {tinyfiledialogs_version} – https://sourceforge.net/p/tinyfiledialogs
+  variant-lite {variant_lite_version} – https://github.com/martinmoene/variant-lite
+  whereami-cpp {whereami_cpp_version} – https://github.com/nabijaczleweli/whereami-cpp
+  yaml-cpp {yaml_cpp_version} – https://github.com/jbeder/yaml-cpp

@@ -30,12 +30,9 @@
 #include "main_app_screen.hpp"
 #include <cmath>
 #include <fmt/format.h>
-#include <iostream>
-#include <nonstd/optional.hpp>
 #include <tinyfiledialogs.h>
 
 
-using namespace std::literals;
 using namespace fmt::literals;
 
 

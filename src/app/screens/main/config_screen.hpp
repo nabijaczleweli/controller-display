@@ -23,41 +23,35 @@
 #pragma once
 
 
-#include "screens/screen.hpp"
+#include "../screen.hpp"
 #include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
+#include <cstdint>
+#include <functional>
 #include <nonstd/optional.hpp>
-#include <memory>
+#include <utility>
+#include <vector>
 
 
-class application {
+class config_screen : public screen {
 private:
-	friend screen;
-	friend class help_screen;
-	friend class config_screen;
-	friend class main_app_screen;
+	enum class selection_verb : bool { forward, back };
+	enum class selected_button : std::uint8_t { vsync, FPS, new_layout_time, end };
 
-	std::unique_ptr<screen> current_screen;
-	std::unique_ptr<screen> temp_screen;
+	nonstd::optional<sf::String> saved_layout;
+	sf::Text config_text;
+	std::vector<std::pair<bool, sf::RectangleShape>> options;
+	selected_button butt;
 
-	nonstd::optional<sf::Vector2u> new_size;
-
-	sf::RenderWindow window;
-
-	int loop();
-	int draw();
+	void click(selection_verb what);
+	void re_text();
 
 
 public:
-	static unsigned int effective_FPS();
+	virtual void setup() override;
+	virtual int loop() override;
+	virtual int draw() override;
+	virtual int handle_event(const sf::Event & event) override;
 
-
-	int run();
-	void resize(sf::Vector2u to);
-	void load_settings();
-
-	template <class T, class... A>
-	inline void schedule_screen(A &&... args) {
-		temp_screen = std::make_unique<T>(*this, std::forward<A>(args)...);
-	}
+	config_screen(application & theapp, nonstd::optional<sf::String> layout);
+	virtual ~config_screen();
 };

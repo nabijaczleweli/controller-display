@@ -25,6 +25,7 @@
 #include "../../../util/dialog.hpp"
 #include "../../application.hpp"
 #include "assets.hpp"
+#include "config_screen.hpp"
 #include "help_screen.hpp"
 #include <fstream>
 #include <iterator>
@@ -125,6 +126,10 @@ int main_app_screen::handle_event(const sf::Event & event) {
 				[[fallthrough]];
 			case sf::Keyboard::H:
 				app.schedule_screen<help_screen>(std::move(layout_src));
+				break;
+
+			case sf::Keyboard::C:
+				app.schedule_screen<config_screen>(std::move(layout_src));
 				break;
 
 			default:

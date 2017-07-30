@@ -36,10 +36,7 @@ unsigned int application::effective_FPS() {
 
 int application::run() {
 	window.create({600, 300}, app_name, sf::Style::Close);
-	if(app_configuration.vsync)
-		window.setVerticalSyncEnabled(true);
-	else
-		window.setFramerateLimit(app_configuration.FPS);
+	load_settings();
 
 	{
 		sf::Image icon;
@@ -52,6 +49,13 @@ int application::run() {
 
 void application::resize(sf::Vector2u to) {
 	new_size = {to};
+}
+
+void application::load_settings() {
+	if(app_configuration.vsync)
+		window.setVerticalSyncEnabled(true);
+	else
+		window.setFramerateLimit(app_configuration.FPS);
 }
 
 int application::loop() {

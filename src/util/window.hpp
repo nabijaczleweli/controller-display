@@ -23,26 +23,36 @@
 #pragma once
 
 
-#include "../screen.hpp"
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <X11/Xlib.h>
+#include <X11/cursorfont.h>
+#endif
+
 #include <SFML/Graphics.hpp>
-#include <nonstd/optional.hpp>
-#include <vector>
-#include <tuple>
 
 
-class help_screen : public screen {
+class cursor {
 private:
-	nonstd::optional<sf::String> saved_layout;
-	std::vector<std::tuple<sf::IntRect, sf::RectangleShape, std::string>> links;
-	sf::Text help_text;
+	sf::WindowHandle window;
+
+#ifndef _WIN32
+	XID current;
+	Display * screen;
+#endif
 
 
 public:
-	virtual void setup() override;
-	virtual int loop() override;
-	virtual int draw() override;
-	virtual int handle_event(const sf::Event & event) override;
+	enum class type : std::uint8_t { normal, hand };
 
-	help_screen(application & theapp, nonstd::optional<sf::String> layout);
-	virtual ~help_screen();
+
+	void update(type to) noexcept;
+
+	cursor(sf::WindowHandle for_w = 0) noexcept;
+	~cursor() noexcept;
 };

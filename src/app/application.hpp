@@ -24,6 +24,7 @@
 
 
 #include "screens/screen.hpp"
+#include "../util/window.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <nonstd/optional.hpp>
@@ -43,6 +44,7 @@ private:
 	nonstd::optional<sf::Vector2u> new_size;
 
 	sf::RenderWindow window;
+	cursor cur;
 
 	int loop();
 	int draw();
@@ -55,6 +57,7 @@ public:
 	int run();
 	void resize(sf::Vector2u to);
 	void load_settings();
+	void set_cursor(cursor::type new_c = cursor::type::normal);
 
 	template <class T, class... A>
 	inline void schedule_screen(A &&... args) {

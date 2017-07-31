@@ -20,29 +20,29 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#pragma once
+#ifdef _WIN32
 
 
-#include "../screen.hpp"
-#include <SFML/Graphics.hpp>
-#include <nonstd/optional.hpp>
-#include <vector>
-#include <tuple>
+#include "window.hpp"
 
 
-class help_screen : public screen {
-private:
-	nonstd::optional<sf::String> saved_layout;
-	std::vector<std::tuple<sf::IntRect, sf::RectangleShape, std::string>> links;
-	sf::Text help_text;
+static LPCTSTR cursor_id(cursor::type c) noexcept {
+	switch(c) {
+		case cursor::type::hand:
+			return IDC_HAND;
+		default:
+			return IDC_ARROW;
+	}
+}
 
 
-public:
-	virtual void setup() override;
-	virtual int loop() override;
-	virtual int draw() override;
-	virtual int handle_event(const sf::Event & event) override;
+void cursor::update(type to) noexcept {
+	SetClassLongPtr(window, GCLP_HCURSOR, reinterpret_cast<LONG_PTR>(LoadCursor(nullptr, cursor_id(to))));
+}
 
-	help_screen(application & theapp, nonstd::optional<sf::String> layout);
-	virtual ~help_screen();
-};
+cursor::cursor(sf::WindowHandle for_w) noexcept : window(for_w) {}
+
+cursor::~cursor() noexcept {}
+
+
+#endif

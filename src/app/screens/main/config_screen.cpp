@@ -125,6 +125,11 @@ int config_screen::handle_event(const sf::Event & event) {
 
 			i = static_cast<selected_button>(static_cast<std::uint8_t>(i) + 1);
 		}
+
+		if(butt == selected_button::end)
+			app.set_cursor(cursor::type::normal);
+		else
+			app.set_cursor(cursor::type::hand);
 	} else if(event.type == sf::Event::MouseButtonPressed) {
 		if(event.mouseButton.button == sf::Mouse::Left)
 			click(selection_verb::forward);
@@ -181,4 +186,5 @@ config_screen::~config_screen() {
 		app_configuration.vsync = true;
 
 	app.load_settings();
+	app.set_cursor(cursor::type::normal);
 }

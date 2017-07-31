@@ -36,6 +36,7 @@ unsigned int application::effective_FPS() {
 
 int application::run() {
 	window.create({600, 300}, app_name, sf::Style::Close);
+	cur = window.getSystemHandle();
 	load_settings();
 
 	{
@@ -56,6 +57,10 @@ void application::load_settings() {
 		window.setVerticalSyncEnabled(true);
 	else
 		window.setFramerateLimit(app_configuration.FPS);
+}
+
+void application::set_cursor(cursor::type new_c) {
+	cur.update(new_c);
 }
 
 int application::loop() {

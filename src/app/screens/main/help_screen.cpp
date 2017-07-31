@@ -28,6 +28,7 @@
 #include "../../application.hpp"
 #include "assets.hpp"
 #include "main_app_screen.hpp"
+#include <algorithm>
 #include <cmath>
 #include <fmt/format.h>
 #include <tinyfiledialogs.h>
@@ -107,7 +108,13 @@ int help_screen::handle_event(const sf::Event & event) {
 
 	if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 		app.schedule_screen<main_app_screen>(std::move(saved_layout));
-	else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+	else if(event.type == sf::Event::MouseMoved) {
+		if(std::any_of(links.begin(), links.end(),
+		               [&](auto && link) { return std::get<sf::RectangleShape>(link).getGlobalBounds().contains(event.mouseMove.x, event.mouseMove.y); }))
+			app.set_cursor(cursor::type::hand);
+		else
+			app.set_cursor(cursor::type::normal);
+	} else if(event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
 		for(auto && link : links)
 			if(std::get<sf::IntRect>(link).contains(event.mouseButton.x, event.mouseButton.y))
 				launch_browser(std::get<std::string>(link).c_str());
@@ -119,4 +126,8 @@ help_screen::help_screen(application & theapp, nonstd::optional<sf::String> slay
 	help_text.setFillColor({0xE5, 0xE5, 0xE5});
 	help_text.setOutlineThickness(1);
 	help_text.setOutlineColor({0x1A, 0x1A, 0x1A});
+}
+
+help_screen::~help_screen() {
+	app.set_cursor(cursor::type::normal);
 }

@@ -20,29 +20,41 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#pragma once
+#ifndef _WIN32
 
 
-#include "../screen.hpp"
-#include <SFML/Graphics.hpp>
-#include <nonstd/optional.hpp>
-#include <vector>
-#include <tuple>
+#include "window.hpp"
 
 
-class help_screen : public screen {
-private:
-	nonstd::optional<sf::String> saved_layout;
-	std::vector<std::tuple<sf::IntRect, sf::RectangleShape, std::string>> links;
-	sf::Text help_text;
+static int cursor_id(cursor::type c) noexcept {
+	switch(c) {
+		case cursor::type::hand:
+			return XC_hand2;
+		default:
+			return XC_left_ptr;
+	}
+}
 
 
-public:
-	virtual void setup() override;
-	virtual int loop() override;
-	virtual int draw() override;
-	virtual int handle_event(const sf::Event & event) override;
+void cursor::update(type to) noexcept {
+	XID old = 0;
+	std::swap(current, old);
 
-	help_screen(application & theapp, nonstd::optional<sf::String> layout);
-	virtual ~help_screen();
-};
+	current = XCreateFontCursor(screen, cursor_id(to));
+	XDefineCursor(screen, window, current);
+	XFlush(screen);
+
+	if(old)
+		XFreeCursor(screen, old);
+}
+
+cursor::cursor(sf::WindowHandle for_w) noexcept : window(for_w), current(0), screen(XOpenDisplay(nullptr)) {}
+
+cursor::~cursor() noexcept {
+	if(current)
+		XFreeCursor(screen, current);
+	XCloseDisplay(screen);
+}
+
+
+#endif

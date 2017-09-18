@@ -39,7 +39,8 @@ using namespace std::literals;
 
 static nonstd::optional<std::string> parse_colour_theme(colour_theme & into, YAML::Node from);
 static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, std::size_t &> into, YAML::Node from);
-static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, std::vector<mouse_button> & mouse_into, YAML::Node from, std::size_t grid_width,
+static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, std::vector<mouse_button> & mouse_into,
+                                                  std::vector<mouse_displacement> & mouse_deltas_into, YAML::Node from, std::size_t grid_width,
                                                   const colour_theme & theme);
 static bool try_preset(colour_theme & thm, const std::string & preset);
 static colour_theme load_preset_theme(const char * preset);
@@ -72,7 +73,7 @@ nonstd::variant<std::unique_ptr<layout>, std::string> layout::load_stream(std::i
 		const auto keys = doc["keys"];
 		if(!keys)
 			return nonstd::variant<std::unique_ptr<layout>, std::string>(nonstd::in_place<std::string>, "Missing required keys key");
-		const auto keys_result = parse_keyset(res->keyboard_keys, res->mouse_buttons, keys, res->grid_width, res->theme);
+		const auto keys_result = parse_keyset(res->keyboard_keys, res->mouse_buttons, res->mouse_displacements, keys, res->grid_width, res->theme);
 		if(keys_result)
 			return {*keys_result};
 
@@ -91,11 +92,13 @@ sf::Vector2u layout::size() {
 void layout::tick() {
 	for_each(keyboard_keys.begin(), keyboard_keys.end(), [](auto && k) { k.tick(); });
 	for_each(mouse_buttons.begin(), mouse_buttons.end(), [](auto && k) { k.tick(); });
+	for_each(mouse_displacements.begin(), mouse_displacements.end(), [](auto && k) { k.tick(); });
 }
 
 void layout::draw(sf::RenderTarget & target, sf::RenderStates states) const {
 	for_each(keyboard_keys.begin(), keyboard_keys.end(), [&](auto && k) { target.draw(k, states); });
 	for_each(mouse_buttons.begin(), mouse_buttons.end(), [&](auto && k) { target.draw(k, states); });
+	for_each(mouse_displacements.begin(), mouse_displacements.end(), [&](auto && k) { target.draw(k, states); });
 }
 
 
@@ -182,7 +185,8 @@ static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, st
 	return nonstd::nullopt;
 }
 
-static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, std::vector<mouse_button> & mouse_into, YAML::Node from, std::size_t grid_width,
+static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, std::vector<mouse_button> & mouse_into,
+                                                  std::vector<mouse_displacement> & mouse_deltas_into, YAML::Node from, std::size_t grid_width,
                                                   const colour_theme & theme) {
 	if(!from.IsSequence())
 		return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Invalid keys key type");
@@ -216,11 +220,16 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 				if(!itr->second.proportional)
 					++x_pos;
 			} else if(pfx == "mouse") {
-				const auto itr = mouse_button_data().find(name);
-				if(itr == mouse_button_data().end())
-					return {"Invalid keys[" + std::to_string(idx) + "] mouse button name"};
-				mouse_into.emplace_back(name, theme);
-				mouse_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
+				if(std::strcmp(name, "delta") == 0) {
+					mouse_deltas_into.emplace_back(10, theme);
+					mouse_deltas_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
+				} else {
+					const auto itr = mouse_button_data().find(name);
+					if(itr == mouse_button_data().end())
+						return {"Invalid keys[" + std::to_string(idx) + "] mouse button name"};
+					mouse_into.emplace_back(name, theme);
+					mouse_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
+				}
 			} else
 				return {"Invalid keys[" + std::to_string(idx) + "] category"};
 		}

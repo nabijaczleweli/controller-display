@@ -23,45 +23,30 @@
 #pragma once
 
 
-#include "../draw/key.hpp"
-#include "../draw/mouse_button.hpp"
-#include "../draw/mouse_displacement.hpp"
 #include <SFML/Graphics.hpp>
-#include <cstdint>
-#include <istream>
-#include <memory>
-#include <nonstd/variant.hpp>
+#include <vector>
 
 
-struct colour_theme {
-	static colour_theme classic;  // Which is a pretentious way of saying "default" which is a keyword
-	static colour_theme dark;
+struct colour_theme;
 
-
-	std::size_t character_size;
-	sf::Color label;
-	sf::Color unclicked;
-	sf::Color clicked;
-	sf::Color outline;
-};
-
-class layout : public sf::Drawable {
+class mouse_displacement : public sf::Drawable, public sf::Transformable {
 private:
-	colour_theme theme;
-	std::vector<key> keyboard_keys;
-	std::vector<mouse_button> mouse_buttons;
-	std::vector<mouse_displacement> mouse_displacements;
-	std::size_t grid_width;
-	std::size_t grid_height;
+	const colour_theme * theme;
 
-	layout() = default;
+	std::vector<sf::Vector2i> past_deltas;
+	std::size_t past_deltas_cur_idx;
+
+	sf::Vector2i last_position;
+	sf::Vertex vector[2];
+	sf::Text label;
 
 
 public:
-	static nonstd::variant<std::unique_ptr<layout>, std::string> load_stream(std::istream & strim);
-
-	sf::Vector2u size();
+	mouse_displacement(std::size_t history_length);
+	mouse_displacement(std::size_t history_length, const colour_theme & theme);
 
 	void tick();
+
+	sf::FloatRect global_bounds() const;
 	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 };

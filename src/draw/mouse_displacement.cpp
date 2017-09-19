@@ -32,24 +32,35 @@ mouse_displacement::mouse_displacement(std::size_t history_length) : mouse_displ
 
 mouse_displacement::mouse_displacement(std::size_t history_length, const colour_theme & thm)
       : theme(&thm), past_deltas(history_length), past_deltas_cur_idx(0), last_position(sf::Mouse::getPosition()),
-        label("", font_default, theme->character_size / 4) {
+        label("", font_default, theme->character_size * 3 / 9) {
 	const float horizontal_size = theme->character_size + theme->character_size / 2;
 	const float separator_size  = horizontal_size / 6.f;
 	const float mid_pos         = horizontal_size + separator_size / 2.f;
 
-	vector[0] = {{mid_pos, mid_pos}, theme->unclicked};
+	vector[0] = vector[1] = {{mid_pos, mid_pos}, theme->unclicked};
+	label.setFillColor(theme->label);
 }
 
 void mouse_displacement::tick() {
+	const float horizontal_size = theme->character_size + theme->character_size / 2;
+	const float separator_size  = horizontal_size / 6.f;
+	const int mid_pos           = horizontal_size + separator_size / 2.f;
+
 	auto && new_pos                  = sf::Mouse::getPosition();
 	past_deltas_cur_idx              = (past_deltas_cur_idx + 1) % past_deltas.size();
 	past_deltas[past_deltas_cur_idx] = new_pos - last_position;
 
-	const auto sum_delta = std::accumulate(past_deltas.begin(), past_deltas.end(), sf::Vector2i{});
-	vector[1].position = static_cast<sf::Vector2f>(static_cast<sf::Vector2i>(vector[0].position) + sum_delta);
+	const auto sum_delta  = std::accumulate(past_deltas.begin(), past_deltas.end(), sf::Vector2i{});
+	auto normalised_delta = sum_delta;
+	normalised_delta.x    = std::min(std::max(normalised_delta.x / 2, -mid_pos), mid_pos);
+	normalised_delta.y    = std::min(std::max(normalised_delta.y / 2, -mid_pos), mid_pos);
+	vector[1].position    = static_cast<sf::Vector2f>(static_cast<sf::Vector2i>(vector[0].position) + normalised_delta);
 
 	label.setString(fmt::format("({:+}, {:+})", sum_delta.x, sum_delta.y));
-	label.setPosition(vector[1].position);
+	const auto && label_size = label.getGlobalBounds();
+	auto new_label_pos = vector[0].position;
+	new_label_pos.x -= label_size.width / 2;
+	label.setPosition(static_cast<sf::Vector2f>(static_cast<sf::Vector2i>(new_label_pos)));
 
 	last_position = new_pos;
 }
@@ -67,5 +78,15 @@ void mouse_displacement::draw(sf::RenderTarget & target, sf::RenderStates states
 	states.transform *= getTransform();
 
 	target.draw(vector, sizeof(vector) / sizeof(*vector), sf::Lines, states);
+	vector[1].position.x += 1;
+	target.draw(vector, sizeof(vector) / sizeof(*vector), sf::Lines, states);
+	vector[1].position.x -= 2;
+	target.draw(vector, sizeof(vector) / sizeof(*vector), sf::Lines, states);
+	vector[1].position.x += 1;
+	vector[1].position.y += 1;
+	target.draw(vector, sizeof(vector) / sizeof(*vector), sf::Lines, states);
+	vector[1].position.y -= 2;
+	target.draw(vector, sizeof(vector) / sizeof(*vector), sf::Lines, states);
+
 	target.draw(label, states);
 }

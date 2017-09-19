@@ -37,7 +37,7 @@ private:
 	std::size_t past_deltas_cur_idx;
 
 	sf::Vector2i last_position;
-	sf::Vertex vector[2];
+	mutable sf::Vertex vector[2];
 	sf::Text label;
 
 

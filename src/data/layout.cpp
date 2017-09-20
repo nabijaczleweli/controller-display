@@ -21,8 +21,10 @@
 
 
 #include "layout.hpp"
+#include "../app/application.hpp"
 #include "../util/parse.hpp"
 #include "assets.hpp"
+#include "container.hpp"
 #include "key_data.hpp"
 #include <cerrno>
 #include <cmath>
@@ -221,7 +223,7 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 					++x_pos;
 			} else if(pfx == "mouse") {
 				if(std::strcmp(name, "delta") == 0) {
-					mouse_deltas_into.emplace_back(10, theme);
+					mouse_deltas_into.emplace_back(app_configuration.mouse_delta_accumulation_time * application::effective_FPS(), theme);
 					mouse_deltas_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 				} else {
 					const auto itr = mouse_button_data().find(name);

@@ -56,6 +56,15 @@ namespace config_subcategories {
 		}
 	};
 
+	struct behaviour {
+		float & mouse_delta_accumulation_time;
+
+		template <class Archive>
+		void serialize(Archive & archive) {
+			archive(cereal::make_nvp("mouse_delta_accumulation_time", mouse_delta_accumulation_time));
+		}
+	};
+
 	struct dependencies {
 		template <class Archive>
 		void save(Archive & archive) const {
@@ -82,6 +91,7 @@ void serialize(Archive & archive, config & cc) {
 	archive(
 	    cereal::make_nvp("display", config_subcategories::display{cc.vsync, cc.FPS}),
 	    cereal::make_nvp("cosmetics", config_subcategories::cosmetics{cc.new_layout_time}),
+	    cereal::make_nvp("behaviour", config_subcategories::behaviour{cc.mouse_delta_accumulation_time}),
 	    cereal::make_nvp("‌controller-display", "version "s + CONTROLLER_DISPLAY_VERSION + ", found at https://github.com/nabijaczleweli/controller-display"),
 	    cereal::make_nvp("‌‌dependencies", config_subcategories::dependencies{}));
 }

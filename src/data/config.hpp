@@ -33,6 +33,8 @@ public:
 
 	float new_layout_time = 2.5;
 
+	float mouse_delta_accumulation_time = 1 / 6.f;
+
 
 	config(std::string && path);
 	~config();

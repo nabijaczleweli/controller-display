@@ -23,6 +23,7 @@
 #pragma once
 
 
+#include "../draw/controller_button.hpp"
 #include "../draw/key.hpp"
 #include "../draw/mouse_button.hpp"
 #include "../draw/mouse_displacement.hpp"
@@ -51,6 +52,7 @@ private:
 	std::vector<key> keyboard_keys;
 	std::vector<mouse_button> mouse_buttons;
 	std::vector<mouse_displacement> mouse_displacements;
+	std::vector<controller_button> controller_buttons;
 	std::size_t grid_width;
 	std::size_t grid_height;
 

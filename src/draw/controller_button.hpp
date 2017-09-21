@@ -23,13 +23,38 @@
 #pragma once
 
 
+#include "../data/key_data.hpp"
 #include <SFML/Graphics.hpp>
-#include <nonstd/optional.hpp>
-#include <string>
-#include <utility>
-#include <vector>
 
 
-// Parse a https://www.w3.org/TR/css3-color
-nonstd::optional<sf::Color> parse_colour(std::string from);
-nonstd::optional<std::pair<std::string, std::vector<std::string>>> parse_function_notation(std::string from);
+struct colour_theme;
+
+class controller_button : public sf::Drawable, public sf::Transformable {
+private:
+	enum class variant_t : std::uint8_t { xyab, stick, control, bumper };
+
+	static variant_t variant_from_button(xbox_controller_button butt);
+
+
+	const controller_button_data_t * data;
+	const colour_theme * theme;
+	variant_t variant;
+
+	std::size_t controller;
+	sf::Text label;
+
+	sf::CircleShape circle;
+
+	sf::RectangleShape background_rectangle;
+	sf::Vertex foreground_triangle[3];
+
+
+public:
+	controller_button(std::size_t controller_num, const std::string & button_id);
+	controller_button(std::size_t controller_num, const std::string & button_id, const colour_theme & theme);
+
+	void tick();
+
+	sf::FloatRect global_bounds() const;
+	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+};

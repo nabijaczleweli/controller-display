@@ -33,6 +33,18 @@
 
 
 enum class mouse_button_direction : std::uint8_t { left, right, other };
+enum class xbox_controller_button : std::uint8_t {
+	A     = 0,
+	B     = 1,
+	X     = 2,
+	Y     = 3,
+	LB    = 4,
+	RB    = 5,
+	Back  = 6,
+	Start = 7,
+	LS    = 8,
+	RS    = 9,
+};
 
 
 template <class code_t>
@@ -46,9 +58,11 @@ struct key_data {
 	bool proportional;
 };
 
-using keyboard_key_data_t = key_data<std::vector<sf::Keyboard::Key>>;
-using mouse_button_data_t = key_data<std::pair<sf::Mouse::Button, mouse_button_direction>>;
+using keyboard_key_data_t      = key_data<std::vector<sf::Keyboard::Key>>;
+using mouse_button_data_t      = key_data<std::pair<sf::Mouse::Button, mouse_button_direction>>;
+using controller_button_data_t = key_data<xbox_controller_button>;
 
 
 const std::unordered_map<std::string, keyboard_key_data_t> & keyboard_key_data();
 const std::unordered_map<std::string, mouse_button_data_t> & mouse_button_data();
+const std::unordered_map<std::string, controller_button_data_t> & controller_button_data();

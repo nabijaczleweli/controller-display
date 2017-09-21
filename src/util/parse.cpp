@@ -215,32 +215,26 @@ nonstd::optional<sf::Color> parse_colour(std::string from) {
 		return nonstd::nullopt;
 	}
 
-	const auto lparen = from.find('(');
-	const auto rparen = from.find(')');
-	if(lparen != std::string::npos && rparen != std::string::npos && rparen > lparen) {
-		auto func = from.substr(0, lparen);
-
-		std::vector<std::string> params;
-		for(auto tkn = std::strtok(&from[0] + lparen + 1, ","); tkn; tkn = std::strtok(NULL, ","))
-			params.emplace_back(tkn);
-
+	auto parsed = parse_function_notation(std::move(from));
+	if(parsed) {
 		auto alpha = 1.f;
-		if(func.size() == 4 && func[3] == 'a') {
-			if(params.size() != 4)
+		if(parsed->first.size() == 4 && parsed->first[3] == 'a') {
+			if(parsed->second.size() != 4)
 				return nonstd::nullopt;
-			alpha = parse_css3_float(params.back());
-			params.pop_back();
-			func.pop_back();
+			alpha = parse_css3_float(parsed->second.back());
+			parsed->second.pop_back();
+			parsed->first.pop_back();
 		}
-		if(params.size() != 3)
+		if(parsed->second.size() != 3)
 			return nonstd::nullopt;
 
-		if(func == "rgb")
-			return {{parse_css3_int(params[0]), parse_css3_int(params[1]), parse_css3_int(params[2]), static_cast<std::uint8_t>(alpha * 255)}};
-		else if(func == "hsl") {
-			const auto h  = std::fmod(std::fmod(std::strtod(params[0].c_str(), nullptr), 360.) + 360., 360.) / 360.;  // 0 .. 1
-			const auto s  = parse_css3_float(params[1]);
-			const auto l  = parse_css3_float(params[2]);
+		if(parsed->first == "rgb")
+			return {
+			    {parse_css3_int(parsed->second[0]), parse_css3_int(parsed->second[1]), parse_css3_int(parsed->second[2]), static_cast<std::uint8_t>(alpha * 255)}};
+		else if(parsed->first == "hsl") {
+			const auto h  = std::fmod(std::fmod(std::strtod(parsed->second[0].c_str(), nullptr), 360.) + 360., 360.) / 360.;  // 0 .. 1
+			const auto s  = parse_css3_float(parsed->second[1]);
+			const auto l  = parse_css3_float(parsed->second[2]);
 			const auto m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
 			const auto m1 = l * 2 - m2;
 			return {{static_cast<std::uint8_t>(std::min(1., std::max(0., css3_hue_to_rgb(m1, m2, h + 1 / 3))) * 255),
@@ -250,6 +244,24 @@ nonstd::optional<sf::Color> parse_colour(std::string from) {
 	}
 
 	return nonstd::nullopt;
+}
+
+nonstd::optional<std::pair<std::string, std::vector<std::string>>> parse_function_notation(std::string from) {
+	const auto lparen = from.find('(');
+	const auto rparen = from.find(')');
+
+	if(lparen == 0)
+		return nonstd::nullopt;
+	else if(lparen != std::string::npos && rparen != std::string::npos && rparen > lparen) {
+		auto func = from.substr(0, lparen);
+
+		std::vector<std::string> params;
+		for(auto tkn = std::strtok(&from[0] + lparen + 1, ","); tkn; tkn = std::strtok(NULL, ","))
+			params.emplace_back(tkn);
+
+		return {{func, params}};
+	} else
+		return {{from.substr(0, lparen), {}}};
 }
 
 

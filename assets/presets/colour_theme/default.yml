@@ -3,3 +3,18 @@ label: "#101010"
 unclicked: "#D8D8D8"
 clicked: "#F2F2F2"
 outline: black
+
+# Colours from https://upload.wikimedia.org/wikipedia/commons/2/2c/360_controller.svg
+xbox:
+  a:
+    unclicked: "#54FF00"
+    clicked: "#00AF00"
+  b:
+    unclicked: "#FF0000"
+    clicked: "#AF0000"
+  x:
+    unclicked: "#0006FF"
+    clicked: "#0000AF"
+  y:
+    unclicked: "#FFCC00"
+    clicked: "#AF9600"

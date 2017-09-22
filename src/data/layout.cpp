@@ -48,8 +48,8 @@ static bool try_preset(colour_theme & thm, const std::string & preset);
 static colour_theme load_preset_theme(const char * preset);
 
 
-colour_theme colour_theme::classic = load_preset_theme(assets::presets_colour_theme_default_yml_s);
-colour_theme colour_theme::dark    = load_preset_theme(assets::presets_colour_theme_dark_yml_s);
+const colour_theme colour_theme::classic = load_preset_theme(assets::presets_colour_theme_default_yml_s);
+const colour_theme colour_theme::dark    = load_preset_theme(assets::presets_colour_theme_dark_yml_s);
 
 
 nonstd::variant<std::unique_ptr<layout>, std::string> layout::load_stream(std::istream & strim) {
@@ -142,6 +142,32 @@ static nonstd::optional<std::string> parse_colour_theme(colour_theme & into, YAM
 					return {"Invalid CSS3 colour in theme."s + pr.first};
 				pr.second = *parsed;
 			}
+
+			const auto xbox = from["xbox"];
+			if(xbox && xbox.IsMap())
+				for(auto && tpl : std::initializer_list<std::pair<const char *, std::pair<sf::Color &, sf::Color &>>>{
+				        {"a", {into.xbox_A_button_unclicked, into.xbox_A_button_clicked}},
+				        {"b", {into.xbox_B_button_unclicked, into.xbox_B_button_clicked}},
+				        {"x", {into.xbox_X_button_unclicked, into.xbox_X_button_clicked}},
+				        {"y", {into.xbox_Y_button_unclicked, into.xbox_Y_button_clicked}}}) {
+					const auto btn = xbox[tpl.first];
+					if(!btn)
+						continue;
+					if(!btn.IsMap())
+						return {"Invalid theme.xbox."s + tpl.first + " key type"};
+
+					for(auto && pr : std::initializer_list<std::pair<const char *, sf::Color &>>{{"unclicked", tpl.second.first}, {"clicked", tpl.second.second}}) {
+						const auto clr = btn[pr.first];
+						if(!clr)
+							continue;
+						if(!clr.IsScalar())
+							return {"Invalid theme.xbox."s + tpl.first + "." + pr.first + " key type"};
+						const auto parsed = parse_colour(clr.Scalar());
+						if(!parsed)
+							return {"Invalid CSS3 colour in theme.xbox."s + tpl.first + "." + pr.first};
+						pr.second = *parsed;
+					}
+				}
 		} break;
 
 		default:

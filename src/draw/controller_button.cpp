@@ -25,11 +25,6 @@
 #include "../data/layout.hpp"
 
 
-/// Colours from https://upload.wikimedia.org/wikipedia/commons/2/2c/360_controller.svg
-static sf::Color Y_fill_colour_unclicked(0xFF, 0xCC, 0x00);
-static sf::Color Y_fill_colour_clicked(0xAF, 0x96, 0x00);
-
-
 controller_button::variant_t controller_button::variant_from_button(xbox_controller_button butt) {
 	switch(butt) {
 		case xbox_controller_button::A:
@@ -68,7 +63,6 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 		case variant_t::xyab: {
 			circle.setRadius(radius);
 			circle.setOutlineThickness(-outline_size);
-			circle.setFillColor(Y_fill_colour_unclicked);
 			circle.setOutlineColor(theme->outline);
 
 			const auto label_bounds = label.getLocalBounds();
@@ -87,7 +81,22 @@ void controller_button::tick() {
 
 	switch(variant) {
 		case variant_t::xyab:
-			circle.setFillColor(pressed ? Y_fill_colour_clicked : Y_fill_colour_unclicked);
+			switch(data->keycodes) {
+				case xbox_controller_button::A:
+					circle.setFillColor(pressed ? theme->xbox_A_button_clicked : theme->xbox_A_button_unclicked);
+					break;
+				case xbox_controller_button::B:
+					circle.setFillColor(pressed ? theme->xbox_B_button_clicked : theme->xbox_B_button_unclicked);
+					break;
+				case xbox_controller_button::X:
+					circle.setFillColor(pressed ? theme->xbox_X_button_clicked : theme->xbox_X_button_unclicked);
+					break;
+				case xbox_controller_button::Y:
+					circle.setFillColor(pressed ? theme->xbox_Y_button_clicked : theme->xbox_Y_button_unclicked);
+					break;
+				default:
+					break;
+			}
 			break;
 		case variant_t::stick:
 		case variant_t::control:

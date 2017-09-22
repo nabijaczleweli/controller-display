@@ -35,8 +35,8 @@
 
 
 struct colour_theme {
-	static colour_theme classic;  // Which is a pretentious way of saying "default" which is a keyword
-	static colour_theme dark;
+	static const colour_theme classic;  // Which is a pretentious way of saying "default" which is a keyword
+	static const colour_theme dark;
 
 
 	std::size_t character_size;
@@ -44,6 +44,15 @@ struct colour_theme {
 	sf::Color unclicked;
 	sf::Color clicked;
 	sf::Color outline;
+
+	sf::Color xbox_A_button_unclicked;
+	sf::Color xbox_B_button_unclicked;
+	sf::Color xbox_X_button_unclicked;
+	sf::Color xbox_Y_button_unclicked;
+	sf::Color xbox_A_button_clicked;
+	sf::Color xbox_B_button_clicked;
+	sf::Color xbox_X_button_clicked;
+	sf::Color xbox_Y_button_clicked;
 };
 
 class layout : public sf::Drawable {

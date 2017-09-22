@@ -1,4 +1,4 @@
-character-size: 40
+base: default
 label: gray
 unclicked: "#272727"
 clicked: "#080808"

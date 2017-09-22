@@ -25,6 +25,7 @@
 
 #include "../data/key_data.hpp"
 #include <SFML/Graphics.hpp>
+#include <nonstd/optional.hpp>
 
 
 struct colour_theme;
@@ -44,6 +45,9 @@ private:
 	sf::Text label;
 
 	sf::CircleShape circle;
+
+	sf::Sprite bumper;
+	sf::Sprite bumper_border;
 
 	sf::RectangleShape background_rectangle;
 	sf::Vertex foreground_triangle[3];

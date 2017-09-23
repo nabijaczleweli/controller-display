@@ -30,7 +30,7 @@
 static const sf::Texture & bumper_texture() {
 	static sf::Texture bsp = []() {
 		sf::Texture t;
-		t.loadFromMemory(assets::buttons_xbox_bumper_png, sizeof assets::buttons_xbox_bumper_png / sizeof *assets::buttons_xbox_bumper_png);
+		t.loadFromMemory(assets::buttons_xbox_bumper_png, sizeof assets::buttons_xbox_bumper_png);
 		return t;
 	}();
 	return bsp;
@@ -39,7 +39,34 @@ static const sf::Texture & bumper_texture() {
 static const sf::Texture & bumper_border_texture() {
 	static sf::Texture bbsp = []() {
 		sf::Texture t;
-		t.loadFromMemory(assets::buttons_xbox_bumper_border_png, sizeof assets::buttons_xbox_bumper_border_png / sizeof *assets::buttons_xbox_bumper_border_png);
+		t.loadFromMemory(assets::buttons_xbox_bumper_border_png, sizeof assets::buttons_xbox_bumper_border_png);
+		return t;
+	}();
+	return bbsp;
+}
+
+static const sf::Texture & control_texture() {
+	static sf::Texture bbsp = []() {
+		sf::Texture t;
+		t.loadFromMemory(assets::buttons_xbox_control_png, sizeof assets::buttons_xbox_control_png);
+		return t;
+	}();
+	return bbsp;
+}
+
+static const sf::Texture & control_border_texture() {
+	static sf::Texture bbsp = []() {
+		sf::Texture t;
+		t.loadFromMemory(assets::buttons_xbox_control_border_png, sizeof assets::buttons_xbox_control_border_png);
+		return t;
+	}();
+	return bbsp;
+}
+
+static const sf::Texture & control_triangle_texture() {
+	static sf::Texture bbsp = []() {
+		sf::Texture t;
+		t.loadFromMemory(assets::buttons_xbox_control_triangle_png, sizeof assets::buttons_xbox_control_triangle_png);
 		return t;
 	}();
 	return bbsp;
@@ -92,9 +119,34 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 			const auto label_bounds = label.getGlobalBounds();
 			label.setPosition(vertical_size / 2 - label_bounds.width / 2, theme->character_size / 4 / 2 + (theme->character_size - label.getCharacterSize()) / 8);
 		} break;
-		case variant_t::control:
-			// TODO
-			break;
+		case variant_t::control: {
+			// Assumes control size = control_border size = control_triangle size
+			control.setTexture(control_texture());
+			control_border.setTexture(control_border_texture());
+			control_triangle.setTexture(control_triangle_texture());
+			control_border.setColor(theme->outline);
+			control_triangle.setColor(theme->label);
+
+			const auto && control_size  = control_texture().getSize();
+			const auto horizontal_scale = vertical_size / control_size.x;
+			const auto vertical_scale   = vertical_size / control_size.y;
+			const auto scale            = std::min(horizontal_scale, vertical_scale);
+			control.setScale(scale, scale);
+			control_border.setScale(scale, scale);
+			control_triangle.setScale(scale, scale);
+			if(data->keycodes == xbox_controller_button::Start)
+				control_triangle.setScale(scale, scale);
+			else {
+				// Based on https://stackoverflow.com/a/26399604/2851815
+				control_triangle.setScale(-scale, scale);
+				control_triangle.setOrigin({control_triangle.getLocalBounds().width, 0});
+			}
+
+			const auto && control_bounds = control.getGlobalBounds();
+			control.setPosition(vertical_size / 2 - control_bounds.width / 2, vertical_size / 2 - control_bounds.height / 2);
+			control_border.setPosition(control.getPosition());
+			control_triangle.setPosition(control.getPosition());
+		} break;
 		case variant_t::bumper: {
 			// Assumes bumper size = bumper_border size
 			bumper.setTexture(bumper_texture());
@@ -162,7 +214,7 @@ void controller_button::tick() {
 			circle.setFillColor(pressed ? theme->clicked : theme->unclicked);
 			break;
 		case variant_t::control:
-			// TODO
+			control.setColor(pressed ? theme->clicked : theme->unclicked);
 			break;
 		case variant_t::bumper:
 			bumper.setColor(pressed ? theme->clicked : theme->unclicked);
@@ -178,8 +230,10 @@ sf::FloatRect controller_button::global_bounds() const {
 			bgbounds = circle.getLocalBounds();
 			break;
 		case variant_t::control:
+			bgbounds = control.getLocalBounds();
+			break;
 		case variant_t::bumper:
-			bgbounds = background_rectangle.getLocalBounds();
+			bgbounds = bumper.getLocalBounds();
 			break;
 	}
 
@@ -199,8 +253,9 @@ void controller_button::draw(sf::RenderTarget & target, sf::RenderStates states)
 			target.draw(label, states);
 			break;
 		case variant_t::control:
-			target.draw(background_rectangle, states);
-			target.draw(foreground_triangle, sizeof(foreground_triangle) / sizeof(*foreground_triangle), sf::Triangles, states);
+			target.draw(control, states);
+			target.draw(control_border, states);
+			target.draw(control_triangle, states);
 			break;
 		case variant_t::bumper:
 			target.draw(bumper, states);

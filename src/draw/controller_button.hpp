@@ -30,6 +30,7 @@
 
 struct colour_theme;
 
+// TODO: Chuck various different data into a variant (the class is just under 2.5kB as is, can be reduced to the minimal 1kB with a union)
 class controller_button : public sf::Drawable, public sf::Transformable {
 private:
 	enum class variant_t : std::uint8_t { xyab, stick, control, bumper };
@@ -49,8 +50,9 @@ private:
 	sf::Sprite bumper;
 	sf::Sprite bumper_border;
 
-	sf::RectangleShape background_rectangle;
-	sf::Vertex foreground_triangle[3];
+	sf::Sprite control;
+	sf::Sprite control_border;
+	sf::Sprite control_triangle;
 
 
 public:

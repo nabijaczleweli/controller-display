@@ -107,7 +107,10 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 	switch(variant) {
 		case variant_t::xyab:
 		case variant_t::stick: {
-			xyab_stick_variant_data dt{{data->label, font_default, static_cast<unsigned int>(theme->character_size)}, sf::CircleShape(radius, 900)};
+			unsigned int character_size = theme->character_size;
+			if(variant == variant_t::stick)
+				character_size = theme->character_size * 26 / 29;
+			xyab_stick_variant_data dt{{data->label, font_default, character_size}, sf::CircleShape(radius, 900)};
 
 			dt.circle.setOutlineThickness(-outline_size);
 			dt.circle.setOutlineColor(theme->outline);
@@ -189,9 +192,6 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 			draw_data = std::move(dt);
 		} break;
 	}
-
-	if(variant == variant_t::stick)
-		nonstd::get<xyab_stick_variant_data>(draw_data).label.setCharacterSize(theme->character_size * 26 / 29);
 }
 
 void controller_button::tick() {

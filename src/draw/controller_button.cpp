@@ -46,30 +46,30 @@ static const sf::Texture & bumper_border_texture() {
 }
 
 static const sf::Texture & control_texture() {
-	static sf::Texture bbsp = []() {
+	static sf::Texture csp = []() {
 		sf::Texture t;
 		t.loadFromMemory(assets::buttons_xbox_control_png, sizeof assets::buttons_xbox_control_png);
 		return t;
 	}();
-	return bbsp;
+	return csp;
 }
 
 static const sf::Texture & control_border_texture() {
-	static sf::Texture bbsp = []() {
+	static sf::Texture cbsp = []() {
 		sf::Texture t;
 		t.loadFromMemory(assets::buttons_xbox_control_border_png, sizeof assets::buttons_xbox_control_border_png);
 		return t;
 	}();
-	return bbsp;
+	return cbsp;
 }
 
 static const sf::Texture & control_triangle_texture() {
-	static sf::Texture bbsp = []() {
+	static sf::Texture ctsp = []() {
 		sf::Texture t;
 		t.loadFromMemory(assets::buttons_xbox_control_triangle_png, sizeof assets::buttons_xbox_control_triangle_png);
 		return t;
 	}();
-	return bbsp;
+	return ctsp;
 }
 
 
@@ -99,70 +99,71 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
       : controller_button(controller_num, button_id, colour_theme::classic) {}
 
 controller_button::controller_button(std::size_t controller_num, const std::string & button_id, const colour_theme & thm)
-      : data(&controller_button_data().at(button_id)), theme(&thm), variant(variant_from_button(data->keycodes)), controller(controller_num),
-        label(data->label, font_default, theme->character_size), circle(0, 900) {
+      : data(&controller_button_data().at(button_id)), theme(&thm), variant(variant_from_button(data->keycodes)), controller(controller_num) {
 	const float vertical_size = theme->character_size + theme->character_size / 2;
 	const float radius        = vertical_size / 2;
 	const float outline_size  = radius / 6;
 
-	label.setFillColor(theme->label);
-
 	switch(variant) {
-		case variant_t::stick:
-			label.setCharacterSize(theme->character_size * 26 / 29);
-			[[fallthrough]];
-		case variant_t::xyab: {
-			circle.setRadius(radius);
-			circle.setOutlineThickness(-outline_size);
-			circle.setOutlineColor(theme->outline);
+		case variant_t::xyab:
+		case variant_t::stick: {
+			xyab_stick_variant_data dt{{data->label, font_default, static_cast<unsigned int>(theme->character_size)}, sf::CircleShape(radius, 900)};
 
-			const auto label_bounds = label.getGlobalBounds();
-			label.setPosition(vertical_size / 2 - label_bounds.width / 2, theme->character_size / 4 / 2 + (theme->character_size - label.getCharacterSize()) / 8);
+			dt.circle.setOutlineThickness(-outline_size);
+			dt.circle.setOutlineColor(theme->outline);
+
+			const auto label_bounds = dt.label.getGlobalBounds();
+			dt.label.setPosition(vertical_size / 2 - label_bounds.width / 2,
+			                     theme->character_size / 4 / 2 + (theme->character_size - dt.label.getCharacterSize()) / 8);
+			dt.label.setFillColor(theme->label);
+
+			draw_data = std::move(dt);
 		} break;
 		case variant_t::control: {
-			// Assumes control size = control_border size = control_triangle size
-			control.setTexture(control_texture());
-			control_border.setTexture(control_border_texture());
-			control_triangle.setTexture(control_triangle_texture());
-			control_border.setColor(theme->outline);
-			control_triangle.setColor(theme->label);
+			control_variant_data dt{sf::Sprite(control_texture()), sf::Sprite(control_border_texture()), sf::Sprite(control_triangle_texture())};
 
+			dt.control_border.setColor(theme->outline);
+			dt.control_triangle.setColor(theme->label);
+
+			// Assumes control size = control_border size = control_triangle size
 			const auto && control_size  = control_texture().getSize();
 			const auto horizontal_scale = vertical_size / control_size.x;
 			const auto vertical_scale   = vertical_size / control_size.y;
 			const auto scale            = std::min(horizontal_scale, vertical_scale);
-			control.setScale(scale, scale);
-			control_border.setScale(scale, scale);
-			control_triangle.setScale(scale, scale);
+			dt.control.setScale(scale, scale);
+			dt.control_border.setScale(scale, scale);
+			dt.control_triangle.setScale(scale, scale);
 			if(data->keycodes == xbox_controller_button::Start)
-				control_triangle.setScale(scale, scale);
+				dt.control_triangle.setScale(scale, scale);
 			else {
 				// Based on https://stackoverflow.com/a/26399604/2851815
-				control_triangle.setScale(-scale, scale);
-				control_triangle.setOrigin({control_triangle.getLocalBounds().width, 0});
+				dt.control_triangle.setScale(-scale, scale);
+				dt.control_triangle.setOrigin({dt.control_triangle.getLocalBounds().width, 0});
 			}
 
-			const auto && control_bounds = control.getGlobalBounds();
-			control.setPosition(vertical_size / 2 - control_bounds.width / 2, vertical_size / 2 - control_bounds.height / 2);
-			control_border.setPosition(control.getPosition());
-			control_triangle.setPosition(control.getPosition());
+			const auto && control_bounds = dt.control.getGlobalBounds();
+			dt.control.setPosition(vertical_size / 2 - control_bounds.width / 2, vertical_size / 2 - control_bounds.height / 2);
+			dt.control_border.setPosition(dt.control.getPosition());
+			dt.control_triangle.setPosition(dt.control.getPosition());
+
+			draw_data = std::move(dt);
 		} break;
 		case variant_t::bumper: {
+			bumper_variant_data dt{
+			    {data->label, font_default, static_cast<unsigned int>(theme->character_size)}, sf::Sprite(bumper_texture()), sf::Sprite(bumper_border_texture())};
+			dt.bumper_border.setColor(theme->outline);
+
 			// Assumes bumper size = bumper_border size
-			bumper.setTexture(bumper_texture());
-			bumper_border.setTexture(bumper_border_texture());
-			bumper_border.setColor(theme->outline);
-
-
 			const auto && bumper_size   = bumper_texture().getSize();
 			const float separator_size  = vertical_size / 6.f;
 			const float horizontal_size = vertical_size * 2 + separator_size;
 			const float border_distance = 6.f / 40.f * theme->character_size;
 
-			label.setCharacterSize(theme->character_size * 26 / 29);
-			label.setPosition(data->keycodes == xbox_controller_button::LB ? static_cast<int>(horizontal_size - label.getGlobalBounds().width - 1.5 * border_distance)
-			                                                               : static_cast<int>(border_distance),
-			                  0);
+			dt.label.setCharacterSize(theme->character_size * 26 / 29);
+			dt.label.setPosition(data->keycodes == xbox_controller_button::LB
+			                         ? static_cast<int>(horizontal_size - dt.label.getGlobalBounds().width - 1.5 * border_distance)
+			                         : static_cast<int>(border_distance),
+			                     0);
 
 			const auto horizontal_scale = horizontal_size / bumper_size.x;
 			const auto vertical_scale   = vertical_size / bumper_size.y;
@@ -170,22 +171,27 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 
 
 			if(data->keycodes == xbox_controller_button::LB) {
-				bumper.setScale(scale, scale);
-				bumper_border.setScale(scale, scale);
+				dt.bumper.setScale(scale, scale);
+				dt.bumper_border.setScale(scale, scale);
 			} else {
 				// Based on https://stackoverflow.com/a/26399604/2851815
-				bumper.setScale(-scale, scale);
-				bumper_border.setScale(-scale, scale);
-				const auto w = bumper.getLocalBounds().width;
-				bumper.setOrigin({w, 0});
-				bumper_border.setOrigin({w, 0});
+				dt.bumper.setScale(-scale, scale);
+				dt.bumper_border.setScale(-scale, scale);
+				const auto w = dt.bumper.getLocalBounds().width;
+				dt.bumper.setOrigin({w, 0});
+				dt.bumper_border.setOrigin({w, 0});
 			}
 
-			const auto && bumper_bounds = bumper.getGlobalBounds();
-			bumper.setPosition(horizontal_size / 2 - bumper_bounds.width / 2, vertical_size / 2 - bumper_bounds.height / 2);
-			bumper_border.setPosition(bumper.getPosition());
+			const auto && bumper_bounds = dt.bumper.getGlobalBounds();
+			dt.bumper.setPosition(horizontal_size / 2 - bumper_bounds.width / 2, vertical_size / 2 - bumper_bounds.height / 2);
+			dt.bumper_border.setPosition(dt.bumper.getPosition());
+
+			draw_data = std::move(dt);
 		} break;
 	}
+
+	if(variant == variant_t::stick)
+		nonstd::get<xyab_stick_variant_data>(draw_data).label.setCharacterSize(theme->character_size * 26 / 29);
 }
 
 void controller_button::tick() {
@@ -195,29 +201,29 @@ void controller_button::tick() {
 		case variant_t::xyab:
 			switch(data->keycodes) {
 				case xbox_controller_button::A:
-					circle.setFillColor(pressed ? theme->xbox_A_button_clicked : theme->xbox_A_button_unclicked);
+					nonstd::get<xyab_stick_variant_data>(draw_data).circle.setFillColor(pressed ? theme->xbox_A_button_clicked : theme->xbox_A_button_unclicked);
 					break;
 				case xbox_controller_button::B:
-					circle.setFillColor(pressed ? theme->xbox_B_button_clicked : theme->xbox_B_button_unclicked);
+					nonstd::get<xyab_stick_variant_data>(draw_data).circle.setFillColor(pressed ? theme->xbox_B_button_clicked : theme->xbox_B_button_unclicked);
 					break;
 				case xbox_controller_button::X:
-					circle.setFillColor(pressed ? theme->xbox_X_button_clicked : theme->xbox_X_button_unclicked);
+					nonstd::get<xyab_stick_variant_data>(draw_data).circle.setFillColor(pressed ? theme->xbox_X_button_clicked : theme->xbox_X_button_unclicked);
 					break;
 				case xbox_controller_button::Y:
-					circle.setFillColor(pressed ? theme->xbox_Y_button_clicked : theme->xbox_Y_button_unclicked);
+					nonstd::get<xyab_stick_variant_data>(draw_data).circle.setFillColor(pressed ? theme->xbox_Y_button_clicked : theme->xbox_Y_button_unclicked);
 					break;
 				default:
 					break;
 			}
 			break;
 		case variant_t::stick:
-			circle.setFillColor(pressed ? theme->clicked : theme->unclicked);
+			nonstd::get<xyab_stick_variant_data>(draw_data).circle.setFillColor(pressed ? theme->clicked : theme->unclicked);
 			break;
 		case variant_t::control:
-			control.setColor(pressed ? theme->clicked : theme->unclicked);
+			nonstd::get<control_variant_data>(draw_data).control.setColor(pressed ? theme->clicked : theme->unclicked);
 			break;
 		case variant_t::bumper:
-			bumper.setColor(pressed ? theme->clicked : theme->unclicked);
+			nonstd::get<bumper_variant_data>(draw_data).bumper.setColor(pressed ? theme->clicked : theme->unclicked);
 			break;
 	}
 }
@@ -227,13 +233,13 @@ sf::FloatRect controller_button::global_bounds() const {
 	switch(variant) {
 		case variant_t::xyab:
 		case variant_t::stick:
-			bgbounds = circle.getLocalBounds();
+			bgbounds = nonstd::get<xyab_stick_variant_data>(draw_data).circle.getLocalBounds();
 			break;
 		case variant_t::control:
-			bgbounds = control.getLocalBounds();
+			bgbounds = nonstd::get<control_variant_data>(draw_data).control.getLocalBounds();
 			break;
 		case variant_t::bumper:
-			bgbounds = bumper.getLocalBounds();
+			bgbounds = nonstd::get<bumper_variant_data>(draw_data).bumper.getLocalBounds();
 			break;
 	}
 
@@ -248,19 +254,22 @@ void controller_button::draw(sf::RenderTarget & target, sf::RenderStates states)
 
 	switch(variant) {
 		case variant_t::xyab:
-		case variant_t::stick:
-			target.draw(circle, states);
-			target.draw(label, states);
-			break;
-		case variant_t::control:
-			target.draw(control, states);
-			target.draw(control_border, states);
-			target.draw(control_triangle, states);
-			break;
-		case variant_t::bumper:
-			target.draw(bumper, states);
-			target.draw(bumper_border, states);
-			target.draw(label, states);
-			break;
+		case variant_t::stick: {
+			const auto & dt = nonstd::get<xyab_stick_variant_data>(draw_data);
+			target.draw(dt.circle, states);
+			target.draw(dt.label, states);
+		} break;
+		case variant_t::control: {
+			const auto & dt = nonstd::get<control_variant_data>(draw_data);
+			target.draw(dt.control, states);
+			target.draw(dt.control_border, states);
+			target.draw(dt.control_triangle, states);
+		} break;
+		case variant_t::bumper: {
+			const auto & dt = nonstd::get<bumper_variant_data>(draw_data);
+			target.draw(dt.bumper, states);
+			target.draw(dt.bumper_border, states);
+			target.draw(dt.label, states);
+		} break;
 	}
 }

@@ -26,16 +26,31 @@
 #include "../data/key_data.hpp"
 #include <SFML/Graphics.hpp>
 #include <nonstd/optional.hpp>
+#include <nonstd/variant.hpp>
 
 
 struct colour_theme;
 
-// TODO: Chuck various different data into a variant (the class is just under 2.5kB as is, can be reduced to the minimal 1kB with a union)
 class controller_button : public sf::Drawable, public sf::Transformable {
 private:
 	enum class variant_t : std::uint8_t { xyab, stick, control, bumper };
-
 	static variant_t variant_from_button(xbox_controller_button butt);
+
+	struct no_variant_data {};  // nonstd::variant<T0, ...> default-constructs T0, let's not incur the overhead of creating any "real" data
+	struct xyab_stick_variant_data {
+		sf::Text label;
+		sf::CircleShape circle;
+	};
+	struct control_variant_data {
+		sf::Sprite control;
+		sf::Sprite control_border;
+		sf::Sprite control_triangle;
+	};
+	struct bumper_variant_data {
+		sf::Text label;
+		sf::Sprite bumper;
+		sf::Sprite bumper_border;
+	};
 
 
 	const controller_button_data_t * data;
@@ -43,17 +58,7 @@ private:
 	variant_t variant;
 
 	std::size_t controller;
-	sf::Text label;
-
-	sf::CircleShape circle;
-
-	sf::Sprite bumper;
-	sf::Sprite bumper_border;
-
-	sf::Sprite control;
-	sf::Sprite control_border;
-	sf::Sprite control_triangle;
-
+	nonstd::variant<no_variant_data, xyab_stick_variant_data, control_variant_data, bumper_variant_data> draw_data;
 
 public:
 	controller_button(std::size_t controller_num, const std::string & button_id);

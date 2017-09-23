@@ -81,15 +81,17 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 	label.setFillColor(theme->label);
 
 	switch(variant) {
+		case variant_t::stick:
+			label.setCharacterSize(theme->character_size * 26 / 29);
+			[[fallthrough]];
 		case variant_t::xyab: {
 			circle.setRadius(radius);
 			circle.setOutlineThickness(-outline_size);
 			circle.setOutlineColor(theme->outline);
 
-			const auto label_bounds = label.getLocalBounds();
-			label.setPosition(vertical_size / 2 - label_bounds.width / 2, theme->character_size / 4 / 2);
+			const auto label_bounds = label.getGlobalBounds();
+			label.setPosition(vertical_size / 2 - label_bounds.width / 2, theme->character_size / 4 / 2 + (theme->character_size - label.getCharacterSize()) / 8);
 		} break;
-		case variant_t::stick:
 		case variant_t::control:
 			// TODO
 			break;
@@ -157,6 +159,8 @@ void controller_button::tick() {
 			}
 			break;
 		case variant_t::stick:
+			circle.setFillColor(pressed ? theme->clicked : theme->unclicked);
+			break;
 		case variant_t::control:
 			// TODO
 			break;

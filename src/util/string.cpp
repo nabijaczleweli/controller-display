@@ -30,3 +30,9 @@ bool string_eq_caseless(std::string lhs, std::string rhs) {
 	std::transform(rhs.begin(), rhs.end(), rhs.begin(), [](auto c) { return std::tolower(c); });
 	return lhs == rhs;
 }
+
+const char * ltrim(const char * whom) {
+	while(whom[0] && std::isspace(whom[0]))
+		++whom;
+	return whom;
+}

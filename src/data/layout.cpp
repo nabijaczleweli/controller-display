@@ -44,7 +44,8 @@ static nonstd::optional<std::string> parse_colour_theme(colour_theme & into, YAM
 static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, std::size_t &> into, YAML::Node from);
 static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, std::vector<mouse_button> & mouse_into,
                                                   std::vector<mouse_displacement> & mouse_deltas_into, std::vector<controller_button> & controller_buttons_into,
-                                                  std::vector<controller_dpad> & controller_dpads_into, YAML::Node from, std::size_t grid_width,
+                                                  std::vector<controller_dpad> & controller_dpads_into,
+                                                  std::vector<controller_analog> & controller_analogs_into, YAML::Node from, std::size_t grid_width,
                                                   const colour_theme & theme);
 static bool try_preset(colour_theme & thm, const std::string & preset);
 static colour_theme load_preset_theme(const char * preset);
@@ -78,7 +79,7 @@ nonstd::variant<std::unique_ptr<layout>, std::string> layout::load_stream(std::i
 		if(!keys)
 			return nonstd::variant<std::unique_ptr<layout>, std::string>(nonstd::in_place<std::string>, "Missing required keys key");
 		const auto keys_result = parse_keyset(res->keyboard_keys, res->mouse_buttons, res->mouse_displacements, res->controller_buttons, res->controller_dpads,
-		                                      keys, res->grid_width, res->theme);
+		                                      res->controller_analogs, keys, res->grid_width, res->theme);
 		if(keys_result)
 			return {*keys_result};
 
@@ -100,6 +101,7 @@ void layout::tick() {
 	for_each(mouse_displacements.begin(), mouse_displacements.end(), [](auto && k) { k.tick(); });
 	for_each(controller_buttons.begin(), controller_buttons.end(), [](auto && k) { k.tick(); });
 	for_each(controller_dpads.begin(), controller_dpads.end(), [](auto && k) { k.tick(); });
+	for_each(controller_analogs.begin(), controller_analogs.end(), [](auto && k) { k.tick(); });
 }
 
 void layout::draw(sf::RenderTarget & target, sf::RenderStates states) const {
@@ -108,6 +110,7 @@ void layout::draw(sf::RenderTarget & target, sf::RenderStates states) const {
 	for_each(mouse_displacements.begin(), mouse_displacements.end(), [&](auto && k) { target.draw(k, states); });
 	for_each(controller_buttons.begin(), controller_buttons.end(), [&](auto && k) { target.draw(k, states); });
 	for_each(controller_dpads.begin(), controller_dpads.end(), [&](auto && k) { target.draw(k, states); });
+	for_each(controller_analogs.begin(), controller_analogs.end(), [&](auto && k) { target.draw(k, states); });
 }
 
 
@@ -222,7 +225,8 @@ static nonstd::optional<std::string> parse_grid_size(std::pair<std::size_t &, st
 
 static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, std::vector<mouse_button> & mouse_into,
                                                   std::vector<mouse_displacement> & mouse_deltas_into, std::vector<controller_button> & controller_buttons_into,
-                                                  std::vector<controller_dpad> & controller_dpads_into, YAML::Node from, std::size_t grid_width,
+                                                  std::vector<controller_dpad> & controller_dpads_into,
+                                                  std::vector<controller_analog> & controller_analogs_into, YAML::Node from, std::size_t grid_width,
                                                   const colour_theme & theme) {
 	if(!from.IsSequence())
 		return nonstd::optional<std::string>(nonstd::in_place<std::string>, "Invalid keys key type");
@@ -276,6 +280,12 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 				if(string_eq_caseless(parsed->first, "DPad")) {
 					controller_dpads_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), theme);
 					controller_dpads_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
+					++x_pos;
+				} else if(string_eq_caseless(parsed->first, "Stick")) {
+					if(parsed->second.size() < 2)
+						return {"Missing keys[" + std::to_string(idx) + "] controller stick name"};
+					controller_analogs_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), ltrim(parsed->second[1].c_str()), theme);
+					controller_analogs_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 					++x_pos;
 				} else {
 					const auto itr = controller_button_data().find(parsed->first);

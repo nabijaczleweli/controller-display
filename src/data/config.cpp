@@ -62,7 +62,8 @@ namespace config_subcategories {
 
 		template <class Archive>
 		void serialize(Archive & archive) {
-			archive(cereal::make_nvp("mouse_delta_accumulation_time", mouse_delta_accumulation_time), cereal::make_nvp("controller_axis_epsilon", controller_axis_epsilon));
+			archive(cereal::make_nvp("mouse_delta_accumulation_time", mouse_delta_accumulation_time),
+			        cereal::make_nvp("controller_axis_epsilon", controller_axis_epsilon));
 		}
 	};
 

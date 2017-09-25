@@ -23,10 +23,32 @@
 #pragma once
 
 
-#include <string>
+#include "../data/key_data.hpp"
+#include <SFML/Graphics.hpp>
+#include <nonstd/optional.hpp>
+#include <nonstd/variant.hpp>
 
 
-// Disclaimer: how to correctly do caseless string equality comparison is the subject of a couple papers.
-//             I do *not* claim this is "correct", but it's correcter than not doing so.
-bool string_eq_caseless(std::string lhs, std::string rhs);
-const char * ltrim(const char * whom);
+struct colour_theme;
+
+class controller_analog : public sf::Drawable, public sf::Transformable {
+private:
+	const controller_analog_data_t * data;
+	const colour_theme * theme;
+
+	std::size_t controller;
+	sf::Text label;
+	sf::CircleShape circle;
+
+
+	void set_positions(float hor, float ver);
+
+public:
+	controller_analog(std::size_t controller_num, const std::string & analog_id);
+	controller_analog(std::size_t controller_num, const std::string & analog_id, const colour_theme & theme);
+
+	void tick();
+
+	sf::FloatRect global_bounds() const;
+	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
+};

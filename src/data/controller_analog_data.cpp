@@ -20,13 +20,29 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#pragma once
+#include "key_data.hpp"
+#include <algorithm>
+#include <utility>
 
 
-#include <string>
+using namespace std::literals;
 
 
-// Disclaimer: how to correctly do caseless string equality comparison is the subject of a couple papers.
-//             I do *not* claim this is "correct", but it's correcter than not doing so.
-bool string_eq_caseless(std::string lhs, std::string rhs);
-const char * ltrim(const char * whom);
+const std::unordered_map<std::string, controller_analog_data_t> & controller_analog_data() {
+	static const std::unordered_map<std::string, controller_analog_data_t> buttons = []() {
+		std::unordered_map<std::string, controller_analog_data_t> bts;
+
+		for(auto && pr : std::initializer_list<std::pair<const char *, std::pair<sf::Joystick::Axis, sf::Joystick::Axis>>>{
+		        {"RS", {sf::Joystick::Axis::R, sf::Joystick::Axis::U}}, {"LS", {sf::Joystick::Axis::Y, sf::Joystick::Axis::X}}}) {
+			std::string label = pr.first;
+			controller_analog_data_t data{pr.second, label, false, false, false};
+			bts.emplace(label, data);
+
+			std::transform(label.begin(), label.end(), label.begin(), [](char c) { return std::tolower(c); });
+			bts.emplace(std::move(label), data);
+		}
+
+		return bts;
+	}();
+	return buttons;
+}

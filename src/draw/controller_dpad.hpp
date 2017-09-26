@@ -23,23 +23,31 @@
 #pragma once
 
 
-#include <string>
+#include <SFML/Graphics.hpp>
+#include <utility>
 
 
-class config {
-public:
-	bool vsync       = true;
-	unsigned int FPS = 60;
+struct colour_theme;
 
-	float new_layout_time = 2.5;
-
-	float mouse_delta_accumulation_time = 1 / 6.f;
-	float controller_axis_epsilon = 1.f;
-
-
-	config(std::string && path);
-	~config();
-
+class controller_dpad : public sf::Drawable, public sf::Transformable {
 private:
-	std::string path;
+	const colour_theme * theme;
+
+	std::size_t controller;
+	sf::Sprite dpad;
+	sf::Sprite dpad_outline;
+	std::pair<bool, sf::Sprite> dpad_up;
+	std::pair<bool, sf::Sprite> dpad_right;
+	std::pair<bool, sf::Sprite> dpad_down;
+	std::pair<bool, sf::Sprite> dpad_left;
+
+
+public:
+	controller_dpad(std::size_t controller_num);
+	controller_dpad(std::size_t controller_num, const colour_theme & theme);
+
+	void tick();
+
+	sf::FloatRect global_bounds() const;
+	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 };

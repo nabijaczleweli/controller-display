@@ -24,6 +24,7 @@
 
 
 #include "../draw/controller_button.hpp"
+#include "../draw/controller_dpad.hpp"
 #include "../draw/key.hpp"
 #include "../draw/mouse_button.hpp"
 #include "../draw/mouse_displacement.hpp"
@@ -62,6 +63,7 @@ private:
 	std::vector<mouse_button> mouse_buttons;
 	std::vector<mouse_displacement> mouse_displacements;
 	std::vector<controller_button> controller_buttons;
+	std::vector<controller_dpad> controller_dpads;
 	std::size_t grid_width;
 	std::size_t grid_height;
 

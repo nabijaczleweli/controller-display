@@ -106,6 +106,28 @@ int main_app_screen::draw() {
 	return 0;
 }
 
+static const char * axis_str(sf::Joystick::Axis axis) {
+	switch(axis) {
+		case sf::Joystick::Axis::X:
+			return "X";
+		case sf::Joystick::Axis::Y:
+			return "Y";
+		case sf::Joystick::Axis::Z:
+			return "Z";
+		case sf::Joystick::Axis::R:
+			return "R";
+		case sf::Joystick::Axis::U:
+			return "U";
+		case sf::Joystick::Axis::V:
+			return "V";
+		case sf::Joystick::Axis::PovX:
+			return "PovX";
+		case sf::Joystick::Axis::PovY:
+			return "PovY";
+	}
+	return "ERR";
+}
+
 int main_app_screen::handle_event(const sf::Event & event) {
 	if(const auto i = screen::handle_event(event))
 		return i;

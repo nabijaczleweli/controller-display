@@ -23,6 +23,7 @@
 #include "layout.hpp"
 #include "../app/application.hpp"
 #include "../util/parse.hpp"
+#include "../util/string.hpp"
 #include "assets.hpp"
 #include "container.hpp"
 #include "key_data.hpp"
@@ -272,7 +273,7 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 				if(parsed->second.empty())
 					return {"Missing keys[" + std::to_string(idx) + "] controller ID"};
 
-				if(parsed->first == "dpad") {
+				if(string_eq_caseless(parsed->first, "DPad")) {
 					controller_dpads_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), theme);
 					controller_dpads_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 					++x_pos;

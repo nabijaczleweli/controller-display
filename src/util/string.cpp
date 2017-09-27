@@ -23,6 +23,7 @@
 #include "string.hpp"
 #include <algorithm>
 #include <cctype>
+#include <locale>
 
 
 bool string_eq_caseless(std::string lhs, std::string rhs) {
@@ -31,8 +32,20 @@ bool string_eq_caseless(std::string lhs, std::string rhs) {
 	return lhs == rhs;
 }
 
-const char * ltrim(const char * whom) {
-	while(whom[0] && std::isspace(whom[0]))
-		++whom;
-	return whom;
+
+// Stolen from http://stackoverflow.com/a/217605/2851815
+std::string ltrim(std::string s) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](auto c) { return !std::isspace(c); }));
+	return s;
+}
+
+// Stolen from http://stackoverflow.com/a/217605/2851815
+std::string rtrim(std::string s) {
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](auto c) { return !std::isspace(c); }).base(), s.end());
+	return s;
+}
+
+// Stolen from http://stackoverflow.com/a/217605/2851815
+std::string trim(std::string s) {
+	return ltrim(std::move(rtrim(std::move(s))));
 }

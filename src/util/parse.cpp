@@ -21,6 +21,7 @@
 
 
 #include "parse.hpp"
+#include "string.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cmath>

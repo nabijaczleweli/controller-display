@@ -284,7 +284,7 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 				} else if(string_eq_caseless(parsed->first, "Stick")) {
 					if(parsed->second.size() < 2)
 						return {"Missing keys[" + std::to_string(idx) + "] controller stick name"};
-					controller_analogs_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), ltrim(parsed->second[1].c_str()), theme);
+					controller_analogs_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), ltrim(std::move(parsed->second[1])), theme);
 					controller_analogs_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 					++x_pos;
 				} else {

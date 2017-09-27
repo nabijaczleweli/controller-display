@@ -29,4 +29,9 @@
 // Disclaimer: how to correctly do caseless string equality comparison is the subject of a couple papers.
 //             I do *not* claim this is "correct", but it's correcter than not doing so.
 bool string_eq_caseless(std::string lhs, std::string rhs);
-const char * ltrim(const char * whom);
+
+
+// Stolen from http://stackoverflow.com/a/217605/2851815
+std::string ltrim(std::string s);
+std::string rtrim(std::string s);
+std::string trim(std::string s);

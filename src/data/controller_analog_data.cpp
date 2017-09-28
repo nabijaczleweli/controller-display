@@ -32,8 +32,9 @@ const std::unordered_map<std::string, controller_analog_data_t> & controller_ana
 	static const std::unordered_map<std::string, controller_analog_data_t> buttons = []() {
 		std::unordered_map<std::string, controller_analog_data_t> bts;
 
-		for(auto && pr : std::initializer_list<std::pair<const char *, std::pair<sf::Joystick::Axis, sf::Joystick::Axis>>>{
-		        {"RS", {sf::Joystick::Axis::R, sf::Joystick::Axis::U}}, {"LS", {sf::Joystick::Axis::Y, sf::Joystick::Axis::X}}}) {
+		for(auto && pr : std::initializer_list<std::pair<const char *, controller_analog_keycodes>>{
+		        {"RS", {sf::Joystick::Axis::R, sf::Joystick::Axis::U, xbox_controller_button::RS}},
+		        {"LS", {sf::Joystick::Axis::Y, sf::Joystick::Axis::X, xbox_controller_button::LS}}}) {
 			std::string label = pr.first;
 			controller_analog_data_t data{pr.second, label, false, false, false};
 			bts.emplace(label, data);

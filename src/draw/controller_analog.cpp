@@ -35,7 +35,7 @@ void controller_analog::set_positions(float hor, float ver) {
 	const auto rel_pos_x = free_space * hor / 100.f;
 	const auto rel_pos_y = free_space * ver / 100.f;
 
-	const auto label_bounds  = label.getGlobalBounds();
+	const auto label_bounds = label.getGlobalBounds();
 	circle.setPosition(center + rel_pos_x, center + rel_pos_y);
 	label.setPosition(center + rel_pos_x, center + rel_pos_y - label_bounds.height * 2 / 5);
 }
@@ -52,7 +52,6 @@ controller_analog::controller_analog(std::size_t controller_num, const std::stri
 
 	circle.setRadius(radius);
 	circle.setOutlineThickness(-outline_size);
-	circle.setFillColor(theme->unclicked);
 	circle.setOutlineColor(theme->outline);
 
 	label.setFillColor(theme->label);
@@ -64,10 +63,12 @@ controller_analog::controller_analog(std::size_t controller_num, const std::stri
 }
 
 void controller_analog::tick() {
-	const auto vertical   = sf::Joystick::getAxisPosition(controller, data->keycodes.first);
-	const auto horizontal = sf::Joystick::getAxisPosition(controller, data->keycodes.second);
+	const auto vertical   = sf::Joystick::getAxisPosition(controller, data->keycodes.vertical);
+	const auto horizontal = sf::Joystick::getAxisPosition(controller, data->keycodes.horizontal);
+	const auto pressed    = sf::Joystick::isButtonPressed(controller, static_cast<std::uint8_t>(data->keycodes.button));
 
 	set_positions(horizontal, vertical);
+	circle.setFillColor(pressed ? theme->clicked : theme->unclicked);
 }
 
 sf::FloatRect controller_analog::global_bounds() const {

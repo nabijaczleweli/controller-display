@@ -46,6 +46,12 @@ enum class xbox_controller_button : std::uint8_t {
 	RS    = 9,
 };
 
+struct controller_analog_keycodes {
+	sf::Joystick::Axis vertical;
+	sf::Joystick::Axis horizontal;
+	xbox_controller_button button;
+};
+
 
 template <class code_t>
 struct key_data {
@@ -61,7 +67,7 @@ struct key_data {
 using keyboard_key_data_t      = key_data<std::vector<sf::Keyboard::Key>>;
 using mouse_button_data_t      = key_data<std::pair<sf::Mouse::Button, mouse_button_direction>>;
 using controller_button_data_t = key_data<xbox_controller_button>;
-using controller_analog_data_t = key_data<std::pair<sf::Joystick::Axis, sf::Joystick::Axis>>;
+using controller_analog_data_t = key_data<controller_analog_keycodes>;
 
 
 const std::unordered_map<std::string, keyboard_key_data_t> & keyboard_key_data();

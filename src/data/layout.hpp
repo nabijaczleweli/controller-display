@@ -26,6 +26,7 @@
 #include "../draw/controller_analog.hpp"
 #include "../draw/controller_button.hpp"
 #include "../draw/controller_dpad.hpp"
+#include "../draw/controller_trigger.hpp"
 #include "../draw/key.hpp"
 #include "../draw/mouse_button.hpp"
 #include "../draw/mouse_displacement.hpp"
@@ -66,6 +67,7 @@ private:
 	std::vector<controller_button> controller_buttons;
 	std::vector<controller_dpad> controller_dpads;
 	std::vector<controller_analog> controller_analogs;
+	std::vector<controller_trigger> controller_triggers;
 	std::size_t grid_width;
 	std::size_t grid_height;
 

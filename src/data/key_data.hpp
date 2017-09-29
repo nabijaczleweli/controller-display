@@ -64,13 +64,15 @@ struct key_data {
 	bool proportional;
 };
 
-using keyboard_key_data_t      = key_data<std::vector<sf::Keyboard::Key>>;
-using mouse_button_data_t      = key_data<std::pair<sf::Mouse::Button, mouse_button_direction>>;
-using controller_button_data_t = key_data<xbox_controller_button>;
-using controller_analog_data_t = key_data<controller_analog_keycodes>;
+using keyboard_key_data_t       = key_data<std::vector<sf::Keyboard::Key>>;
+using mouse_button_data_t       = key_data<std::pair<sf::Mouse::Button, mouse_button_direction>>;
+using controller_button_data_t  = key_data<xbox_controller_button>;
+using controller_analog_data_t  = key_data<controller_analog_keycodes>;
+using controller_trigger_data_t = key_data<std::pair<sf::Joystick::Axis, bool>>;
 
 
 const std::unordered_map<std::string, keyboard_key_data_t> & keyboard_key_data();
 const std::unordered_map<std::string, mouse_button_data_t> & mouse_button_data();
 const std::unordered_map<std::string, controller_button_data_t> & controller_button_data();
 const std::unordered_map<std::string, controller_analog_data_t> & controller_analog_data();
+const std::unordered_map<std::string, controller_trigger_data_t> & controller_trigger_data();

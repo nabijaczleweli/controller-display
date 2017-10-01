@@ -45,8 +45,9 @@ void help_screen::setup() {
 
 	auto help_txt = from_utf8(fmt::format(
 	    assets::text_help_txt_s,
-	    "controller_display_version"_a = CONTROLLER_DISPLAY_VERSION,                                                                                            //
-	    "cereal_version"_a             = CEREAL_VERSION,                                                                                                        //
+	    "controller_display_version"_a  = CONTROLLER_DISPLAY_VERSION,                                                                                           //
+	    "cereal_version"_a              = CEREAL_VERSION,                                                                                                       //
+	    "css_color_parser_js_version"_a = CSS_COLOR_PARSER_JS_VERSION,                                                                                          //
 	    "fmt_version"_a = format_version{(FMT_VERSION - (FMT_VERSION % 10000)) / 10000, ((FMT_VERSION - (FMT_VERSION % 100)) / 100) % 100, FMT_VERSION % 100},  //
 	    "optional_lite_version"_a   = optional_lite_VERSION,                                                                                                    //
 	    "SFML_version"_a            = format_version{SFML_VERSION_MAJOR, SFML_VERSION_MINOR, SFML_VERSION_PATCH},                                               //

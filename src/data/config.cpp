@@ -71,6 +71,7 @@ namespace config_subcategories {
 		template <class Archive>
 		void save(Archive & archive) const {
 			archive(cereal::make_nvp("cereal", "version "s + CEREAL_VERSION + ", found at https://uscilab.github.io/cereal"),
+			        cereal::make_nvp("css-color-parser-js", "version "s + CSS_COLOR_PARSER_JS_VERSION + ", found at https://github.com/deanm/css-color-parser-js"),
 			        cereal::make_nvp("fmt", fmt::format("fmt version {}, found at http://fmtlib.net",
 			                                            format_version{(FMT_VERSION - (FMT_VERSION % 10000)) / 10000,
 			                                                           ((FMT_VERSION - (FMT_VERSION % 100)) / 100) % 100, FMT_VERSION % 100})),

@@ -9,6 +9,7 @@ Controls:
 
 Credit:
   cereal {cereal_version} – https://uscilab.github.io/cereal
+  css-color-parser-js {css_color_parser_js_version} – https://github.com/deanm/css-color-parser-js
   fmt {fmt_version} – http://fmtlib.net
   optional-lite {optional_lite_version} – https://github.com/martinmoene/optional-lite
   SFML {SFML_version} – https://sfml-dev.org

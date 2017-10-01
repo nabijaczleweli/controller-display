@@ -51,6 +51,7 @@ LNCMAKEAR := LDFLAGS="$(LNCXXAR)"
 
 CONTROLLER_DISPLAY_VERSION := "$(patsubst v%,%,$(shell git describe --tags --abbrev=0))"
 CEREAL_VERSION := "$(patsubst v%,%,$(shell git -C ext/cereal describe --tags))"
+CSS_COLOR_PARSER_JS_VERSION := "$(shell awk '/version/ { print($$2) }' ext/css-color-parser-js/package.json | sed 's/[",]//g')"
 VARIANT_LITE_VERSION := "$(shell git -C ext/variant-lite log -1 --pretty=format:%h)"
 WHEREAMI_CPP_VERSION := "$(patsubst v%,%,$(shell git -C ext/whereami-cpp describe --tags))"
 YAML_CPP_VERSION := "$(shell git -C ext/yaml-cpp log -1 --pretty=format:%h)"

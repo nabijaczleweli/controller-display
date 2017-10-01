@@ -275,7 +275,7 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 					mouse_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 				}
 			} else if(pfx == "xbox") {
-				const auto parsed = parse_function_notation(name);
+				auto parsed = parse_function_notation(name);
 				if(!parsed)
 					return {"Missing keys[" + std::to_string(idx) + "] argument list"};
 				if(parsed->second.empty())
@@ -288,13 +288,21 @@ static nonstd::optional<std::string> parse_keyset(std::vector<key> & keys_into, 
 				} else if(string_eq_caseless(parsed->first, "Stick")) {
 					if(parsed->second.size() < 2)
 						return {"Missing keys[" + std::to_string(idx) + "] controller stick name"};
+					parsed->second[1] = std::move(ltrim(std::move(parsed->second[1])));
+					const auto itr = controller_analog_data().find(parsed->second[1]);
+					if(itr == controller_analog_data().end())
+						return {"Invalid keys[" + std::to_string(idx) + "] controller stick name"};
 					controller_analogs_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), ltrim(std::move(parsed->second[1])), theme);
 					controller_analogs_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 					++x_pos;
-				}  else if(string_eq_caseless(parsed->first, "Trigger")) {
+				} else if(string_eq_caseless(parsed->first, "Trigger")) {
 					if(parsed->second.size() < 2)
-						return {"Missing keys[" + std::to_string(idx) + "] controller stick name"};
-					controller_triggers_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), ltrim(std::move(parsed->second[1])), theme);
+						return {"Missing keys[" + std::to_string(idx) + "] controller trigger name"};
+					parsed->second[1] = std::move(ltrim(std::move(parsed->second[1])));
+					const auto itr = controller_trigger_data().find(parsed->second[1]);
+					if(itr == controller_trigger_data().end())
+						return {"Invalid keys[" + std::to_string(idx) + "] controller trigger name"};
+					controller_triggers_into.emplace_back(std::strtoll(parsed->second[0].c_str(), nullptr, 10), parsed->second[1], theme);
 					controller_triggers_into.back().setPosition(std::floor(x_pos * key_size * (7. / 6.)), std::floor(y_pos * key_size * (7. / 6.)));
 					++x_pos;
 				} else {

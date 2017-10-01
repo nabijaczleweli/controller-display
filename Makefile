@@ -24,7 +24,7 @@ include configMakefile
 
 
 LDDLLS := assets fmt tinyfiledialogs whereami++ yaml-cpp $(OS_LD_LIBS)
-LDAR := $(LNCXXAR) $(foreach l,$(OBJDIR)assets $(foreach l,fmt SFML/lib tinyfiledialogs whereami-cpp yaml-cpp,$(BLDDIR)$(l)),-L$(l)) $(foreach dll,$(LDDLLS),-l$(dll))
+LDAR := $(OS_LD_ARGS) $(LNCXXAR) $(foreach l,$(OBJDIR)assets $(foreach l,fmt SFML/lib tinyfiledialogs whereami-cpp yaml-cpp,$(BLDDIR)$(l)),-L$(l)) $(foreach dll,$(LDDLLS),-l$(dll))
 INCAR := $(foreach l,$(foreach l,cereal optional-lite whereami-cpp yaml-cpp,$(l)/include),-isystemext/$(l)) $(foreach l,fmt SFML tinyfiledialogs variant-lite,-isystem$(BLDDIR)$(l)/include) -I$(BLDDIR)include
 VERAR := $(foreach l,CONTROLLER_DISPLAY CEREAL VARIANT_LITE WHEREAMI_CPP YAML_CPP,-D$(l)_VERSION='$($(l)_VERSION)')
 ASSETS := $(foreach l,$(sort $(wildcard $(ASSETDIR)* $(ASSETDIR)**/* $(ASSETDIR)**/**/* $(ASSETDIR)**/**/**/*)),$(if $(findstring directory,$(shell file $(l))),,$(l)))

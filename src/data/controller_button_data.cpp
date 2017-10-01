@@ -32,16 +32,12 @@ const std::unordered_map<std::string, controller_button_data_t> & controller_but
 	static const std::unordered_map<std::string, controller_button_data_t> buttons = []() {
 		std::unordered_map<std::string, controller_button_data_t> bts;
 
-		for(auto && pr : std::initializer_list<std::tuple<xbox_controller_button, const char *, bool>>{{xbox_controller_button::A, "A", true},
-		                                                                                               {xbox_controller_button::B, "B", true},
-		                                                                                               {xbox_controller_button::X, "X", true},
-		                                                                                               {xbox_controller_button::Y, "Y", true},
-		                                                                                               {xbox_controller_button::LB, "LB", false},
-		                                                                                               {xbox_controller_button::RB, "RB", false},
-		                                                                                               {xbox_controller_button::Back, "Back", true},
-		                                                                                               {xbox_controller_button::Start, "Start", true},
-		                                                                                               {xbox_controller_button::LS, "LS", true},
-		                                                                                               {xbox_controller_button::RS, "RS", true}}) {
+		for(auto && pr : std::initializer_list<std::tuple<xbox_controller_button, const char *, bool>>{
+		        std::make_tuple(xbox_controller_button::A, "A", true), std::make_tuple(xbox_controller_button::B, "B", true),
+		        std::make_tuple(xbox_controller_button::X, "X", true), std::make_tuple(xbox_controller_button::Y, "Y", true),
+		        std::make_tuple(xbox_controller_button::LB, "LB", false), std::make_tuple(xbox_controller_button::RB, "RB", false),
+		        std::make_tuple(xbox_controller_button::Back, "Back", true), std::make_tuple(xbox_controller_button::Start, "Start", true),
+		        std::make_tuple(xbox_controller_button::LS, "LS", true), std::make_tuple(xbox_controller_button::RS, "RS", true)}) {
 			std::string label = std::get<1>(pr);
 			controller_button_data_t data{std::get<0>(pr), label, false, false, std::get<2>(pr)};
 			bts.emplace(label, data);

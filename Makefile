@@ -35,7 +35,7 @@ HEADERS := $(sort $(wildcard src/*.hpp src/**/*.hpp src/**/**/*.hpp src/**/**/**
 .SECONDARY :
 
 
-all : assets fmt sfml tinyfiledialogs variant-lite whereami-cpp yaml-cpp exe
+all : fmt sfml tinyfiledialogs variant-lite whereami-cpp yaml-cpp assets exe
 
 clean :
 	rm -rf $(OUTDIR)

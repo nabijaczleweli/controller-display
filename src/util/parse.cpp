@@ -254,6 +254,7 @@ nonstd::optional<std::pair<std::string, std::vector<std::string>>> parse_functio
 	if(lparen == 0)
 		return nonstd::nullopt;
 	else if(lparen != std::string::npos && rparen != std::string::npos && rparen > lparen) {
+		from.erase(rparen);
 		auto func = from.substr(0, lparen);
 
 		std::vector<std::string> params;

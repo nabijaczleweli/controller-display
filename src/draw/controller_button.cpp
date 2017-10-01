@@ -162,6 +162,7 @@ controller_button::controller_button(std::size_t controller_num, const std::stri
 			const float horizontal_size = vertical_size * 2 + separator_size;
 			const float border_distance = 6.f / 40.f * theme->character_size;
 
+			dt.label.setFillColor(theme->label);
 			dt.label.setCharacterSize(theme->character_size * 26 / 29);
 			dt.label.setPosition(data->keycodes == xbox_controller_button::LB
 			                         ? static_cast<int>(horizontal_size - dt.label.getGlobalBounds().width - 1.5 * border_distance)

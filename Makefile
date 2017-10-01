@@ -56,15 +56,28 @@ $(OUTDIR)controller-display$(EXE) : $(subst $(SRCDIR),$(OBJDIR),$(subst .cpp,$(O
 $(BLDDIR)include/assets.hpp : $(ASSETS)
 	@mkdir -p $(dir $@)
 	echo "#pragma once" > $@
+	echo "#include <string>" >> $@
+	echo "#include <unordered_map>" >> $@
+	echo "#include <SFML/Graphics.hpp>" >> $@
+	echo "" >> $@
 	echo "namespace assets {" >> $@
 	$(foreach l,$^,echo "	extern const unsigned char $(shell echo $(subst $(ASSETDIR),,$(l)) | sed 's/[^[:alnum:]]/_/g')[$(word 1,$(shell wc -c $(l)))];" >> $@;)
 	echo "" >> $@
 	$(foreach l,$^,echo "	extern const char $(shell echo $(subst $(ASSETDIR),,$(l)) | sed 's/[^[:alnum:]]/_/g')_s[$(shell expr $(word 1,$(shell wc -c $(l))) + 1)];" >> $@;)
+	echo "" >> $@
+	echo "	extern const std::unordered_map<std::string, sf::Color> css3_keywords;" >> $@
 	echo "}" >> $@
 
-$(OBJDIR)assets/libassets$(ARCH) : $(patsubst $(ASSETDIR)%,$(OBJDIR)assets/%$(OBJ),$(ASSETS)) $(patsubst $(ASSETDIR)%,$(OBJDIR)assets/%_s$(OBJ),$(ASSETS))
+$(OBJDIR)assets/libassets$(ARCH) : $(patsubst $(ASSETDIR)%,$(OBJDIR)assets/%$(OBJ),$(ASSETS)) $(patsubst $(ASSETDIR)%,$(OBJDIR)assets/%_s$(OBJ),$(ASSETS)) $(BLDDIR)css-color-parser-js/keywords$(OBJ)
 	@mkdir -p $(dir $@)
 	$(AR) crs $@ $^
+
+$(BLDDIR)css-color-parser-js/keywords.cpp : ext/css-color-parser-js/csscolorparser.js
+	@mkdir -p $(dir $@)
+	echo "#include \"assets.hpp\"" > $@
+	echo "const std::unordered_map<std::string, sf::Color> assets::css3_keywords{" >> $@
+	sed -e 's/, "/,\n  "/g' -e 's/]}/],\n}/g' -e 's/[]:[,]/ /g' $^ | awk '/CSSColorTable.*=/,/}/' | tail -n +2 | head -n -1 | awk '{print("\t{" $$1 ", {" $$2 ", " $$3 ", " $$4 ", " ($$5 * 255) "}}," )}' >> $@
+	echo "};" >> $@
 
 $(BLDDIR)fmt/libfmt$(ARCH) : $(patsubst ext/fmt/fmt/%.cc,$(BLDDIR)fmt/obj/%$(OBJ),$(wildcard ext/fmt/fmt/*.cc))
 	@mkdir -p $(dir $@)
@@ -123,11 +136,15 @@ $(OBJDIR)assets/%_s.cpp : $(ASSETDIR)%
 
 $(OBJDIR)assets/%$(OBJ) : $(OBJDIR)assets/%.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXAR) -I$(BLDDIR)include -c -o$@ $^
+	$(CXX) $(CXXAR) $(INCAR) -DSFML_STATIC -c -o$@ $^
 
 $(BLDDIR)fmt/obj/%$(OBJ) : ext/fmt/fmt/%.cc
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXAR) -Iext/fmt -c -o$@ $^
+
+$(BLDDIR)css-color-parser-js/%$(OBJ) : $(BLDDIR)css-color-parser-js/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXAR) $(INCAR) -DSFML_STATIC -c -o$@ $^
 
 $(BLDDIR)tinyfiledialogs/obj/%$(OBJ) : ext/tinyfiledialogs/%.c
 	@mkdir -p $(dir $@)

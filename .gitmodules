@@ -26,3 +26,6 @@
 [submodule "ext/tinyfiledialogs"]
 	path = ext/tinyfiledialogs
 	url = https://git.code.sf.net/p/tinyfiledialogs/code
+[submodule "ext/css-color-parser-js"]
+	path = ext/css-color-parser-js
+	url = https://github.com/deanm/css-color-parser-js
